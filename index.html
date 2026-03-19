@@ -4,2575 +4,562 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IADOPT.AI — The Intelligence Behind Everything</title>
-<meta name="description" content="Deploy AI across your entire business. Ship in days, not months. 10,000+ businesses powered by IADOPT.AI.">
-
-<!-- Fonts: Clash Display (distinctive display) + Satoshi (refined body) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
-
-<!-- Three.js r158 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r158/three.min.js"></script>
-
-<!-- GSAP 3 + Plugins -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
-<!-- Lenis Smooth Scroll -->
-<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
-
 <style>
-/* ============================================
-   CSS VARIABLES & RESET
-   ============================================ */
-:root {
-  --bg: #02020F;
-  --bg-card: rgba(255,255,255,0.03);
-  --primary: #6366F1;
-  --secondary: #8B5CF6;
-  --accent: #EC4899;
-  --cyan: #22D3EE;
-  --text: #F1F5F9;
-  --muted: #94A3B8;
-  --font-display: 'Clash Display', 'Syne', sans-serif;
-  --font-body: 'Satoshi', 'Plus Jakarta Sans', sans-serif;
-}
-
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  overflow-x: hidden;
-  cursor: none;
-}
-
-a { color: inherit; text-decoration: none; cursor: none; }
-button { cursor: none; font-family: inherit; }
-img { max-width: 100%; display: block; }
-ul { list-style: none; }
-
-/* ============================================
-   PAGE LOADER
-   ============================================ */
-#loader {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: #000;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-#loader .loader-text {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 4rem);
-  font-weight: 700;
-  letter-spacing: -1px;
-  color: #fff;
-  opacity: 0;
-}
-
-#loader .loader-bar {
-  width: 120px;
-  height: 2px;
-  background: rgba(255,255,255,0.1);
-  margin-top: 24px;
-  border-radius: 2px;
-  overflow: hidden;
-  opacity: 0;
-}
-
-#loader .loader-bar-fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  border-radius: 2px;
-}
-
-/* ============================================
-   SCROLL PROGRESS BAR
-   ============================================ */
-#scroll-progress {
-  position: fixed;
-  top: 0; left: 0;
-  width: 0%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--cyan));
-  z-index: 10000;
-  transition: none;
-  will-change: width;
-}
-
-/* ============================================
-   CUSTOM CURSOR
-   ============================================ */
-.cursor-outer {
-  position: fixed;
-  width: 40px; height: 40px;
-  border: 1px solid rgba(99,102,241,0.6);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99998;
-  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-  mix-blend-mode: difference;
-}
-
-.cursor-inner {
-  position: fixed;
-  width: 6px; height: 6px;
-  background: var(--secondary);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-}
-
-.cursor-outer.hovering {
-  width: 60px; height: 60px;
-  background: rgba(99,102,241,0.15);
-  border-color: rgba(99,102,241,0.8);
-}
-
-.cursor-outer.clicking {
-  transform: translate(-50%, -50%) scale(0.8);
-}
-
-/* ============================================
-   WEBGL CANVAS
-   ============================================ */
-#webgl-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* ============================================
-   NAVIGATION
-   ============================================ */
-nav {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  z-index: 1000;
-  padding: 20px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: background 0.4s ease, backdrop-filter 0.4s ease;
-}
-
-nav.scrolled {
-  background: rgba(2,2,15,0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.nav-logo {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.4rem;
-  letter-spacing: -0.5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nav-logo .dot {
-  width: 8px; height: 8px;
-  background: var(--primary);
-  border-radius: 50%;
-  display: inline-block;
-  animation: logoPulse 2s ease-in-out infinite;
-}
-
-@keyframes logoPulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--primary); }
-  50% { opacity: 0.5; box-shadow: 0 0 20px var(--primary); }
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.nav-links a {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--muted);
-  transition: color 0.3s ease;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.nav-links a:hover { color: var(--text); }
-
-.nav-cta {
-  padding: 10px 24px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.nav-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(99,102,241,0.4);
-}
-
-/* Mobile nav toggle */
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  padding: 4px;
-  z-index: 1001;
-}
-
-.nav-toggle span {
-  width: 24px;
-  height: 2px;
-  background: var(--text);
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* ============================================
-   MAIN CONTENT WRAPPER
-   ============================================ */
-#smooth-wrapper {
-  position: relative;
-  z-index: 1;
-}
-
-#smooth-content {
-  will-change: transform;
-}
-
-section {
-  position: relative;
-  overflow: hidden;
-}
-
-/* ============================================
-   SECTION 1 — HERO
-   ============================================ */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 0 24px;
-  position: relative;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 900px;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 20px;
-  background: rgba(99,102,241,0.1);
-  border: 1px solid rgba(99,102,241,0.2);
-  border-radius: 100px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--primary);
-  margin-bottom: 32px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.hero-badge .badge-dot {
-  width: 6px; height: 6px;
-  background: #34D399;
-  border-radius: 50%;
-  animation: badgePulse 1.5s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(3.5rem, 9vw, 8rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -3px;
-  color: #fff;
-  margin-bottom: 8px;
-}
-
-.hero h1 .char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(60px) rotateX(-40deg);
-}
-
-.hero-subtitle {
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 3vw, 2.2rem);
-  font-weight: 500;
-  background: linear-gradient(90deg, #6366F1, #EC4899, #22D3EE, #6366F1);
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 4s ease infinite;
-  margin-bottom: 20px;
-  letter-spacing: -0.5px;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.hero-desc {
-  font-size: clamp(1rem, 1.5vw, 1.2rem);
-  color: var(--muted);
-  max-width: 560px;
-  margin: 0 auto 40px;
-  line-height: 1.7;
-  font-weight: 400;
-}
-
-.hero-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.btn-primary {
-  padding: 16px 36px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.btn-primary:hover::before { left: 100%; }
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(99,102,241,0.5);
-}
-
-.btn-outline {
-  padding: 16px 36px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-}
-
-.btn-outline:hover {
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.04);
-  transform: translateY(-2px);
-}
-
-/* Scroll indicator */
-.scroll-indicator {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  opacity: 0.5;
-  animation: scrollFade 2s ease-in-out infinite;
-}
-
-.scroll-indicator .chevron {
-  width: 20px; height: 20px;
-  border-right: 2px solid var(--muted);
-  border-bottom: 2px solid var(--muted);
-  transform: rotate(45deg);
-}
-
-.scroll-indicator .chevron:nth-child(2) { opacity: 0.6; }
-.scroll-indicator .chevron:nth-child(3) { opacity: 0.3; }
-
-@keyframes scrollFade {
-  0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
-  50% { opacity: 0.2; transform: translateX(-50%) translateY(8px); }
-}
-
-/* ============================================
-   SECTION 2 — PRODUCTS
-   ============================================ */
-.products {
-  padding: 120px 24px;
-  min-height: 100vh;
-  position: relative;
-}
-
-.section-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 16px;
-  display: block;
-  text-align: center;
-}
-
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: -2px;
-  margin-bottom: 16px;
-  line-height: 1.1;
-}
-
-.section-desc {
-  text-align: center;
-  color: var(--muted);
-  font-size: 1.1rem;
-  max-width: 560px;
-  margin: 0 auto 64px;
-  line-height: 1.6;
-}
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.product-card {
-  position: relative;
-  padding: 40px 32px;
-  background: var(--bg-card);
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  overflow: hidden;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-  opacity: 0;
-  transform: translateY(40px);
-}
-
-.product-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(99,102,241,0), rgba(139,92,246,0.3), rgba(236,72,153,0));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.product-card:hover::before { opacity: 1; }
-
-.product-card:hover {
-  transform: translateY(-12px);
-  box-shadow: 0 24px 60px rgba(99,102,241,0.15);
-}
-
-.product-card .card-icon {
-  width: 56px; height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));
-  border-radius: 14px;
-  margin-bottom: 24px;
-  transition: transform 0.6s ease;
-}
-
-.product-card:hover .card-icon {
-  transform: rotateY(360deg);
-}
-
-.product-card h3 {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  letter-spacing: -0.5px;
-}
-
-.product-card p {
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
-}
-
-.product-card .card-arrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--primary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin-top: 20px;
-  transition: gap 0.3s ease;
-}
-
-.product-card:hover .card-arrow { gap: 12px; }
-
-/* ============================================
-   SECTION 3 — STATS
-   ============================================ */
-.stats {
-  padding: 140px 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Aurora background */
-.aurora-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.aurora-bg .aurora-1, .aurora-bg .aurora-2, .aurora-bg .aurora-3 {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.3;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-
-.aurora-bg .aurora-1 {
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(99,102,241,0.4), transparent 70%);
-  top: -200px; left: 10%;
-  animation: aurora1 8s ease-in-out infinite alternate;
-}
-
-.aurora-bg .aurora-2 {
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%);
-  bottom: -150px; right: 15%;
-  animation: aurora2 10s ease-in-out infinite alternate;
-}
-
-.aurora-bg .aurora-3 {
-  width: 700px; height: 700px;
-  background: radial-gradient(circle, rgba(34,211,238,0.2), transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  animation: aurora3 12s ease-in-out infinite alternate;
-}
-
-@keyframes aurora1 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(100px, 50px) scale(1.3); }
-}
-@keyframes aurora2 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-80px, -60px) scale(1.2); }
-}
-@keyframes aurora3 {
-  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
-  100% { transform: translate(-40%, -40%) scale(1.4); opacity: 0.3; }
-}
-
-.stats-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  text-align: center;
-}
-
-.stat-item {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.stat-number {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 5rem);
-  font-weight: 700;
-  letter-spacing: -2px;
-  background: linear-gradient(135deg, #fff, var(--cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.stat-label {
-  font-size: 0.95rem;
-  color: var(--muted);
-  font-weight: 400;
-}
-
-.stat-divider {
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  margin: 12px auto 0;
-  border-radius: 2px;
-}
-
-/* ============================================
-   SECTION 4 — HOW IT WORKS (Horizontal scroll)
-   ============================================ */
-.how-it-works {
-  padding: 120px 0;
-  position: relative;
-}
-
-.how-header {
-  text-align: center;
-  padding: 0 24px;
-  margin-bottom: 80px;
-}
-
-.how-track {
-  display: flex;
-  width: 300vw;
-  will-change: transform;
-}
-
-.how-panel {
-  width: 100vw;
-  height: 70vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 80px;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.how-panel-content {
-  max-width: 600px;
-  position: relative;
-  z-index: 1;
-}
-
-.how-step-num {
-  font-family: var(--font-display);
-  font-size: clamp(8rem, 15vw, 14rem);
-  font-weight: 700;
-  color: rgba(255,255,255,0.03);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-  line-height: 1;
-  pointer-events: none;
-}
-
-.how-icon {
-  width: 72px; height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.08));
-  border: 1px solid rgba(99,102,241,0.2);
-  border-radius: 18px;
-  margin-bottom: 28px;
-}
-
-.how-panel-content h3 {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  letter-spacing: -1px;
-  margin-bottom: 16px;
-}
-
-.how-panel-content p {
-  color: var(--muted);
-  font-size: 1.1rem;
-  line-height: 1.7;
-  max-width: 480px;
-}
-
-/* Connecting line between panels */
-.how-connector {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 80px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(99,102,241,0.4), transparent);
-}
-
-/* ============================================
-   SECTION 5 — INDUSTRIES (Bento grid)
-   ============================================ */
-.industries {
-  padding: 140px 24px;
-  position: relative;
-}
-
-.bento-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: auto auto;
-  gap: 20px;
-}
-
-.bento-tile {
-  position: relative;
-  border-radius: 20px;
-  padding: 36px 28px;
-  overflow: hidden;
-  transition: transform 0.4s ease;
-  opacity: 0;
-  transform: scale(0.9) translateY(20px);
-}
-
-.bento-tile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.bento-tile:hover::after { opacity: 1; }
-.bento-tile:hover { transform: scale(1.02) translateY(-4px); }
-
-.bento-tile.large {
-  grid-column: span 2;
-  padding: 48px 36px;
-  min-height: 280px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.bento-tile .tile-icon {
-  font-size: 2rem;
-  margin-bottom: 16px;
-}
-
-.bento-tile h3 {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
-}
-
-.bento-tile.large h3 { font-size: 1.8rem; }
-
-.bento-tile p {
-  color: rgba(255,255,255,0.7);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-/* Tile gradients */
-.tile-healthcare { background: linear-gradient(135deg, #0f172a, #1e3a5f); border: 1px solid rgba(34,211,238,0.15); }
-.tile-finance { background: linear-gradient(135deg, #0f172a, #2d1b69); border: 1px solid rgba(99,102,241,0.15); }
-.tile-retail { background: linear-gradient(135deg, #0f172a, #4a1942); border: 1px solid rgba(236,72,153,0.15); }
-.tile-manufacturing { background: linear-gradient(135deg, #0f172a, #1a3c34); border: 1px solid rgba(52,211,153,0.15); }
-.tile-education { background: linear-gradient(135deg, #0f172a, #3b2f0f); border: 1px solid rgba(251,191,36,0.15); }
-.tile-logistics { background: linear-gradient(135deg, #0f172a, #1e2a4a); border: 1px solid rgba(96,165,250,0.15); }
-
-/* ============================================
-   SECTION 6 — TESTIMONIALS
-   ============================================ */
-.testimonials {
-  padding: 140px 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.testimonial-stage {
-  max-width: 1100px;
-  margin: 0 auto;
-  position: relative;
-  height: 420px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.testimonial-card {
-  position: absolute;
-  width: 420px;
-  padding: 40px;
-  background: var(--bg-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 24px;
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-}
-
-.testimonial-card.center {
-  z-index: 3;
-  transform: translateX(-50%) scale(1);
-  left: 50%;
-  filter: none;
-  opacity: 1;
-}
-
-.testimonial-card.left-card {
-  z-index: 2;
-  transform: translateX(-120%) scale(0.88);
-  left: 50%;
-  filter: blur(2px);
-  opacity: 0.5;
-}
-
-.testimonial-card.right-card {
-  z-index: 2;
-  transform: translateX(20%) scale(0.88);
-  left: 50%;
-  filter: blur(2px);
-  opacity: 0.5;
-}
-
-.testimonial-avatar {
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.testimonial-avatar .avatar-gradient {
-  width: 100%; height: 100%;
-  border-radius: 50%;
-}
-
-.testimonial-stars {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 16px;
-  color: #FBBF24;
-  font-size: 0.9rem;
-}
-
-.testimonial-quote {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--text);
-  margin-bottom: 20px;
-  font-style: italic;
-}
-
-.testimonial-name {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.testimonial-role {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-/* ============================================
-   SECTION 7 — PRICING
-   ============================================ */
-.pricing {
-  padding: 140px 24px;
-  position: relative;
-}
-
-.pricing-grid {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  align-items: center;
-}
-
-.pricing-card {
-  padding: 44px 36px;
-  background: var(--bg-card);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 24px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(40px);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.pricing-card.featured {
-  transform: translateY(-40px) scale(1.05);
-  border: none;
-  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08));
-  opacity: 1;
-}
-
-/* Animated rotating border for featured card */
-.pricing-card.featured::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 26px;
-  background: conic-gradient(from var(--angle, 0deg), var(--primary), var(--accent), var(--cyan), var(--primary));
-  z-index: -1;
-  animation: rotateBorder 4s linear infinite;
-}
-
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes rotateBorder {
-  to { --angle: 360deg; }
-}
-
-.pricing-card.featured::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  background: linear-gradient(135deg, #0a0a1f, #0f0f2a);
-  border-radius: 22px;
-  z-index: -1;
-}
-
-.pricing-badge {
-  display: inline-block;
-  padding: 6px 16px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-.pricing-badge::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: shimmer 2s ease infinite;
-}
-
-@keyframes shimmer {
-  to { left: 100%; }
-}
-
-.pricing-plan {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.pricing-price {
-  font-family: var(--font-display);
-  font-size: 3.2rem;
-  font-weight: 700;
-  letter-spacing: -2px;
-  margin-bottom: 4px;
-}
-
-.pricing-period {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 32px;
-}
-
-.pricing-features {
-  text-align: left;
-  margin-bottom: 32px;
-}
-
-.pricing-features li {
-  padding: 10px 0;
-  font-size: 0.92rem;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.pricing-features li .check {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: rgba(99,102,241,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  font-size: 0.65rem;
-  flex-shrink: 0;
-}
-
-.pricing-btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border: none;
-  transition: all 0.3s ease;
-}
-
-.pricing-btn.filled {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
-}
-
-.pricing-btn.filled:hover {
-  box-shadow: 0 8px 30px rgba(99,102,241,0.4);
-  transform: translateY(-2px);
-}
-
-.pricing-btn.outline {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--text);
-}
-
-.pricing-btn.outline:hover {
-  border-color: rgba(255,255,255,0.3);
-  background: rgba(255,255,255,0.03);
-}
-
-/* ============================================
-   SECTION 8 — CTA
-   ============================================ */
-.cta-section {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 120px 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-#cta-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.cta-content {
-  position: relative;
-  z-index: 1;
-  max-width: 700px;
-}
-
-.cta-content h2 {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 700;
-  letter-spacing: -2px;
-  line-height: 1.1;
-  margin-bottom: 20px;
-}
-
-.cta-content p {
-  font-size: 1.15rem;
-  color: var(--muted);
-  margin-bottom: 40px;
-  line-height: 1.6;
-}
-
-/* ============================================
-   FOOTER
-   ============================================ */
-footer {
-  position: relative;
-  padding: 80px 40px 32px;
-  background: rgba(2,2,15,0.95);
-}
-
-footer::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 2px;
-  background: linear-gradient(90deg, var(--primary), var(--accent), var(--cyan), var(--primary));
-  background-size: 200% 100%;
-  animation: gradientShift 4s ease infinite;
-}
-
-.footer-top {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.5fr repeat(4, 1fr) 1.5fr;
-  gap: 40px;
-  margin-bottom: 60px;
-}
-
-.footer-brand .footer-logo {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.3rem;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.footer-brand .footer-tagline {
-  font-size: 0.85rem;
-  color: var(--muted);
-  line-height: 1.6;
-  max-width: 240px;
-}
-
-.footer-col h4 {
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text);
-  margin-bottom: 20px;
-}
-
-.footer-col a {
-  display: block;
-  font-size: 0.88rem;
-  color: var(--muted);
-  padding: 6px 0;
-  transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.footer-col a:hover {
-  color: var(--text);
-  transform: translateX(4px);
-}
-
-.footer-newsletter p {
-  font-size: 0.88rem;
-  color: var(--muted);
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.newsletter-form {
-  display: flex;
-  gap: 8px;
-}
-
-.newsletter-form input {
-  flex: 1;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 0.88rem;
-  font-family: var(--font-body);
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.newsletter-form input:focus { border-color: var(--primary); }
-.newsletter-form input::placeholder { color: var(--muted); }
-
-.newsletter-form button {
-  padding: 12px 20px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  border: none;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: box-shadow 0.3s ease;
-}
-
-.newsletter-form button:hover {
-  box-shadow: 0 4px 20px rgba(99,102,241,0.4);
-}
-
-.footer-bottom {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.footer-copy {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.footer-socials {
-  display: flex;
-  gap: 16px;
-}
-
-.footer-socials a {
-  width: 36px; height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
-  color: var(--muted);
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
-.footer-socials a:hover {
-  background: rgba(99,102,241,0.15);
-  border-color: rgba(99,102,241,0.3);
-  color: var(--primary);
-  transform: translateY(-2px);
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 1024px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 48px 24px; }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
-  .pricing-card.featured { transform: none; }
-  .bento-grid { grid-template-columns: repeat(2, 1fr); }
-  .bento-tile.large { grid-column: span 2; }
-  .footer-top { grid-template-columns: 1fr 1fr; }
-}
-
-@media (max-width: 768px) {
-  nav { padding: 16px 20px; }
-  .nav-links { display: none; }
-  .nav-toggle { display: flex; }
-
-  .nav-links.open {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(2,2,15,0.97);
-    backdrop-filter: blur(20px);
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    z-index: 1000;
-  }
-
-  .nav-links.open a { font-size: 1.2rem; color: var(--text); }
-
-  .hero h1 { letter-spacing: -1px; }
-  .products-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr; gap: 40px; }
-  .bento-grid { grid-template-columns: 1fr; }
-  .bento-tile.large { grid-column: span 1; }
-
-  .testimonial-stage { height: auto; min-height: 360px; }
-  .testimonial-card { position: relative; width: 100%; max-width: 400px; }
-  .testimonial-card.left-card, .testimonial-card.right-card { display: none; }
-  .testimonial-card.center { position: relative; transform: none; left: auto; margin: 0 auto; }
-
-  .how-panel { padding: 0 24px; height: auto; min-height: 50vh; }
-
-  .footer-top { grid-template-columns: 1fr; gap: 32px; }
-  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
-
-  /* Disable custom cursor on mobile */
-  .cursor-outer, .cursor-inner { display: none; }
-  body { cursor: auto; }
-  a, button { cursor: pointer; }
-
-  .hero-buttons { flex-direction: column; width: 100%; }
-  .btn-primary, .btn-outline { width: 100%; justify-content: center; }
-}
-
-@media (max-width: 480px) {
-  .hero h1 { font-size: 2.8rem; }
-  .section-title { font-size: 2rem; }
-}
-
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
-.reveal { opacity: 0; transform: translateY(30px); }
-.reveal.visible { opacity: 1; transform: translateY(0); transition: opacity 0.8s ease, transform 0.8s ease; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#02020F;--p:#6366F1;--s:#8B5CF6;--a:#EC4899;--c:#22D3EE;
+  --text:#F1F5F9;--muted:#94A3B8;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.6s,transform 0.6s}
+#loader h1{font-size:clamp(2rem,6vw,5rem);font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,#6366F1,#EC4899,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#loader p{color:#666;margin-top:8px;font-size:0.9rem;letter-spacing:4px;text-transform:uppercase}
+
+/* CANVAS */
+#webgl{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 5%;display:flex;align-items:center;justify-content:space-between;background:rgba(2,2,15,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-logo{font-size:1.4rem;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;gap:32px}
+.nav-links a{color:var(--muted);font-size:0.9rem;transition:color 0.2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:linear-gradient(135deg,var(--p),var(--a));border:none;color:#fff;padding:10px 24px;border-radius:50px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity 0.2s,transform 0.2s}
+.nav-cta:hover{opacity:0.85;transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:120px 5%}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:80px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:50px;padding:6px 16px;font-size:0.8rem;color:var(--p);margin-bottom:32px}
+.hero-badge span{width:6px;height:6px;background:var(--c);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+#hero h1{font-size:clamp(3rem,9vw,8rem);font-weight:900;letter-spacing:-3px;line-height:1;margin-bottom:24px}
+.grad{background:linear-gradient(135deg,var(--p),var(--s),var(--a),var(--c));background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradAnim 5s ease infinite}
+@keyframes gradAnim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+#hero p{font-size:clamp(1rem,2.5vw,1.3rem);color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:40px}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.btn-primary{background:linear-gradient(135deg,var(--p),var(--a));border:none;color:#fff;padding:16px 40px;border-radius:50px;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.3s;box-shadow:0 0 30px rgba(99,102,241,0.4)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(99,102,241,0.6)}
+.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;padding:16px 40px;border-radius:50px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.3s}
+.btn-secondary:hover{border-color:var(--p);background:rgba(99,102,241,0.1);transform:translateY(-3px)}
+.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:0.8rem;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+
+/* SECTION HEADER */
+.section-label{font-size:0.8rem;letter-spacing:4px;text-transform:uppercase;color:var(--p);margin-bottom:16px}
+.section-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-1px;line-height:1.1;margin-bottom:20px}
+.section-sub{color:var(--muted);font-size:1.1rem;max-width:600px;line-height:1.7;margin-bottom:64px}
+
+/* PRODUCTS */
+#products{text-align:center}
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto}
+@media(max-width:900px){.products-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.products-grid{grid-template-columns:1fr}}
+.product-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;text-align:left;transition:all 0.4s;cursor:pointer;opacity:0;transform:translateY(40px)}
+.product-card:hover{background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.4);transform:translateY(-8px)!important;box-shadow:0 20px 60px rgba(99,102,241,0.15)}
+.card-icon{font-size:2.5rem;margin-bottom:20px;display:block}
+.card-title{font-size:1.2rem;font-weight:700;margin-bottom:8px}
+.card-desc{color:var(--muted);font-size:0.9rem;line-height:1.6}
+.card-link{display:inline-flex;align-items:center;gap:6px;color:var(--p);font-size:0.85rem;font-weight:600;margin-top:16px;transition:gap 0.2s}
+.card-link:hover{gap:10px}
+
+/* STATS */
+#stats{text-align:center;background:radial-gradient(ellipse at 50% 50%,rgba(99,102,241,0.12) 0%,transparent 70%)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;max-width:900px;margin:0 auto}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-item{opacity:0;transform:translateY(30px)}
+.stat-num{font-size:clamp(2.5rem,5vw,4rem);font-weight:900;background:linear-gradient(135deg,var(--p),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-label{color:var(--muted);font-size:0.9rem;margin-top:8px}
+
+/* HOW IT WORKS */
+#how{text-align:center}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:1000px;margin:0 auto;position:relative}
+.steps::before{content:'';position:absolute;top:50px;left:calc(16.6% + 20px);width:calc(66.6% - 40px);height:2px;background:linear-gradient(90deg,var(--p),var(--a));opacity:0.4}
+@media(max-width:700px){.steps{grid-template-columns:1fr}.steps::before{display:none}}
+.step{opacity:0;transform:translateY(40px)}
+.step-num{font-size:5rem;font-weight:900;color:rgba(99,102,241,0.15);line-height:1;margin-bottom:16px}
+.step-icon{font-size:2rem;margin-bottom:16px}
+.step h3{font-size:1.2rem;font-weight:700;margin-bottom:8px}
+.step p{color:var(--muted);font-size:0.9rem;line-height:1.6}
+
+/* INDUSTRIES */
+#industries{text-align:center}
+.industries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px;margin:0 auto}
+@media(max-width:900px){.industries-grid{grid-template-columns:repeat(2,1fr)}}
+.industry-tile{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 20px;text-align:center;opacity:0;transform:scale(0.9);transition:all 0.3s;cursor:pointer}
+.industry-tile:hover{background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.3);transform:scale(1.04)!important}
+.industry-icon{font-size:2.2rem;margin-bottom:12px}
+.industry-tile h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+.industry-tile p{color:var(--muted);font-size:0.8rem;line-height:1.5}
+
+/* TESTIMONIALS */
+#testimonials{text-align:center}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto}
+@media(max-width:800px){.testi-grid{grid-template-columns:1fr}}
+.testi-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px;text-align:left;opacity:0;transform:translateY(40px)}
+.testi-stars{color:#F59E0B;font-size:1rem;margin-bottom:16px}
+.testi-quote{font-size:1rem;line-height:1.7;margin-bottom:24px;color:#E2E8F0}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem}
+.testi-name{font-weight:700;font-size:0.95rem}
+.testi-role{color:var(--muted);font-size:0.8rem}
+
+/* PRICING */
+#pricing{text-align:center}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:0 auto;align-items:start}
+@media(max-width:800px){.pricing-grid{grid-template-columns:1fr}}
+.pricing-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:40px 32px;opacity:0;transform:translateY(40px);position:relative;transition:all 0.3s}
+.pricing-card:hover{transform:translateY(-8px)!important;box-shadow:0 20px 60px rgba(99,102,241,0.1)}
+.pricing-card.featured{background:rgba(99,102,241,0.08);border-color:var(--p);box-shadow:0 0 60px rgba(99,102,241,0.2)}
+.pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--p),var(--a));color:#fff;font-size:0.75rem;font-weight:700;padding:6px 20px;border-radius:50px;white-space:nowrap}
+.pricing-tier{font-size:0.85rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.pricing-price{font-size:3rem;font-weight:900;line-height:1;margin-bottom:8px}
+.pricing-price span{font-size:1rem;color:var(--muted);font-weight:400}
+.pricing-desc{color:var(--muted);font-size:0.9rem;margin-bottom:32px}
+.pricing-features{list-style:none;margin-bottom:32px;text-align:left}
+.pricing-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.9rem;display:flex;align-items:center;gap:10px;color:#CBD5E1}
+.pricing-features li::before{content:'✓';color:var(--c);font-weight:700;flex-shrink:0}
+.btn-pricing{width:100%;padding:14px;border-radius:50px;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.3s;border:none}
+.btn-pricing.outlined{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff}
+.btn-pricing.outlined:hover{border-color:var(--p);background:rgba(99,102,241,0.1)}
+.btn-pricing.filled{background:linear-gradient(135deg,var(--p),var(--a));color:#fff}
+.btn-pricing.filled:hover{opacity:0.85;transform:translateY(-2px)}
+
+/* CTA */
+#cta{text-align:center;padding:140px 5%;background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,0.15) 0%,transparent 60%)}
+#cta h2{font-size:clamp(2rem,6vw,4.5rem);font-weight:900;letter-spacing:-2px;margin-bottom:20px;opacity:0;transform:translateY(40px)}
+#cta p{color:var(--muted);font-size:1.1rem;margin-bottom:48px;opacity:0;transform:translateY(20px)}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;transform:translateY(20px)}
+.trust-badges{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:48px;opacity:0}
+.badge{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:0.85rem}
+.badge-icon{color:var(--c)}
+
+/* FOOTER */
+footer{background:rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.06);padding:60px 5% 30px}
+.footer-top{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:40px;margin-bottom:48px}
+@media(max-width:900px){.footer-top{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.footer-top{grid-template-columns:1fr}}
+.footer-brand p{color:var(--muted);font-size:0.9rem;line-height:1.6;margin-top:12px;max-width:240px}
+.footer-col h4{font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.footer-col a{display:block;color:var(--muted);font-size:0.9rem;margin-bottom:10px;transition:color 0.2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap}
+.footer-bottom p{color:var(--muted);font-size:0.85rem}
+
+/* SCROLL PROGRESS */
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--p),var(--a),var(--c));z-index:9999;width:0%;transition:none}
+
+/* CURSOR */
+#cursor-dot{position:fixed;width:8px;height:8px;background:var(--p);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:none}
+#cursor-ring{position:fixed;width:40px;height:40px;border:1px solid rgba(99,102,241,0.5);border-radius:50%;pointer-events:none;z-index:9997;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s,background 0.2s}
+@media(max-width:768px){#cursor-dot,#cursor-ring{display:none}}
+
+/* FLOATING SHAPES */
+.float-shape{position:absolute;border-radius:50%;pointer-events:none;animation:floatAnim 6s ease-in-out infinite}
+@keyframes floatAnim{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(180deg)}}
 </style>
 </head>
 <body>
 
-<!-- ============================================
-     PAGE LOADER
-     ============================================ -->
+<!-- LOADER -->
 <div id="loader">
-  <div class="loader-text">IADOPT.AI</div>
-  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  <h1>IADOPT.AI</h1>
+  <p>The Intelligence Behind Everything</p>
 </div>
 
-<!-- ============================================
-     SCROLL PROGRESS BAR
-     ============================================ -->
-<div id="scroll-progress"></div>
+<!-- SCROLL PROGRESS -->
+<div id="progress"></div>
 
-<!-- ============================================
-     CUSTOM CURSOR
-     ============================================ -->
-<div class="cursor-outer"></div>
-<div class="cursor-inner"></div>
+<!-- CUSTOM CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
 
-<!-- ============================================
-     WEBGL CANVAS
-     ============================================ -->
-<canvas id="webgl-canvas"></canvas>
+<!-- WEBGL CANVAS -->
+<canvas id="webgl"></canvas>
 
-<!-- ============================================
-     NAVIGATION
-     ============================================ -->
-<nav id="main-nav">
-  <a href="#" class="nav-logo"><span class="dot"></span> IADOPT.AI</a>
-  <div class="nav-links" id="navLinks">
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IADOPT.AI</div>
+  <div class="nav-links">
     <a href="#products">Products</a>
-    <a href="#industries">Industries</a>
+    <a href="#how">How It Works</a>
     <a href="#pricing">Pricing</a>
-    <a href="#about">About</a>
-    <button class="nav-cta">Get Started</button>
+    <a href="#cta">Contact</a>
   </div>
-  <button class="nav-toggle" id="navToggle" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
+  <button class="nav-cta">Get Started Free</button>
 </nav>
 
-<!-- ============================================
-     MAIN CONTENT
-     ============================================ -->
-<div id="smooth-wrapper">
-<div id="smooth-content">
-
-<!-- SECTION 1 — HERO -->
-<section class="hero" id="hero">
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="badge-dot"></span>
-      Now Generally Available
-    </div>
-    <h1 id="hero-title">IADOPT.AI</h1>
-    <div class="hero-subtitle">The Intelligence Behind Everything</div>
-    <p class="hero-desc">Deploy AI across your entire business. Ship in days, not months. Transform every workflow, every decision, every outcome.</p>
-    <div class="hero-buttons">
-      <button class="btn-primary">Start Free <span>→</span></button>
-      <button class="btn-outline">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="6,3 13,8 6,13" fill="currentColor"/></svg>
-        Watch Demo
-      </button>
-    </div>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge"><span></span>Now in Public Beta — Join 10,000+ businesses</div>
+  <h1>The Intelligence<br><span class="grad">Behind Everything</span></h1>
+  <p>Deploy AI across your entire business. Recruit smarter, automate deeper, grow faster. Ship in days, not months.</p>
+  <div class="hero-btns">
+    <button class="btn-primary">Start Free Trial →</button>
+    <button class="btn-secondary">Watch Demo ▶</button>
   </div>
-  <div class="scroll-indicator">
-    <div class="chevron"></div>
-    <div class="chevron"></div>
-    <div class="chevron"></div>
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <span>↓</span>
   </div>
 </section>
 
-<!-- SECTION 2 — PRODUCTS -->
-<section class="products" id="products">
-  <span class="section-label">Products</span>
-  <h2 class="section-title">One platform.<br>Infinite possibilities.</h2>
-  <p class="section-desc">Six AI-powered products designed to transform every corner of your business.</p>
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="section-label">Our Products</div>
+  <h2 class="section-title">AI That Powers Every Department</h2>
+  <p class="section-sub">Six specialized AI products, one unified platform. Each built to make your team 10x more effective.</p>
   <div class="products-grid">
-
-    <div class="product-card">
-      <div class="card-icon">🤖</div>
-      <h3>IADOPT Recruit</h3>
-      <p>AI-powered hiring and talent acquisition. Screen thousands of candidates in seconds with unbiased, intelligent matching.</p>
-      <div class="card-arrow">Learn more <span>→</span></div>
-    </div>
-
-    <div class="product-card">
-      <div class="card-icon">💬</div>
-      <h3>IADOPT Chat</h3>
-      <p>Conversational AI that understands context, emotion, and intent. Handle millions of customer interactions effortlessly.</p>
-      <div class="card-arrow">Learn more <span>→</span></div>
-    </div>
-
-    <div class="product-card">
-      <div class="card-icon">📊</div>
-      <h3>IADOPT Analytics</h3>
-      <p>Predictive business intelligence that sees around corners. Turn raw data into strategic advantage in real time.</p>
-      <div class="card-arrow">Learn more <span>→</span></div>
-    </div>
-
-    <div class="product-card">
-      <div class="card-icon">⚡</div>
-      <h3>IADOPT Automate</h3>
-      <p>Workflow automation engine that eliminates repetitive tasks. Connect, orchestrate, and scale operations with zero code.</p>
-      <div class="card-arrow">Learn more <span>→</span></div>
-    </div>
-
-    <div class="product-card">
-      <div class="card-icon">🛡️</div>
-      <h3>IADOPT Shield</h3>
-      <p>AI security and compliance monitoring. Real-time threat detection, automated audits, and bulletproof data governance.</p>
-      <div class="card-arrow">Learn more <span>→</span></div>
-    </div>
-
-    <div class="product-card">
-      <div class="card-icon">🔗</div>
-      <h3>IADOPT CRM</h3>
-      <p>Intelligent customer relationship management. Predict churn, personalize outreach, and close deals 3× faster.</p>
-      <div class="card-arrow">Learn more <span>→</span></div>
-    </div>
-
+    <div class="product-card"><span class="card-icon">🤖</span><div class="card-title">IADOPT Recruit</div><div class="card-desc">AI-powered hiring that screens, ranks and schedules candidates automatically. Cut time-to-hire by 80%.</div><div class="card-link">Learn more →</div></div>
+    <div class="product-card"><span class="card-icon">💬</span><div class="card-title">IADOPT Chat</div><div class="card-desc">Conversational AI for customer support, sales, and onboarding. Available 24/7, speaks 50+ languages.</div><div class="card-link">Learn more →</div></div>
+    <div class="product-card"><span class="card-icon">📊</span><div class="card-title">IADOPT Analytics</div><div class="card-desc">Predictive intelligence that spots trends before they happen. Turn data into decisions automatically.</div><div class="card-link">Learn more →</div></div>
+    <div class="product-card"><span class="card-icon">⚡</span><div class="card-title">IADOPT Automate</div><div class="card-desc">Build complex workflows with zero code. Connect 200+ tools and automate any business process.</div><div class="card-link">Learn more →</div></div>
+    <div class="product-card"><span class="card-icon">🛡️</span><div class="card-title">IADOPT Shield</div><div class="card-desc">AI-powered security and compliance. SOC2, GDPR, HIPAA ready. Detects threats before they strike.</div><div class="card-link">Learn more →</div></div>
+    <div class="product-card"><span class="card-icon">🔗</span><div class="card-title">IADOPT CRM</div><div class="card-desc">Intelligent customer relationships. AI scores leads, predicts churn, and suggests next best actions.</div><div class="card-link">Learn more →</div></div>
   </div>
 </section>
 
-<!-- SECTION 3 — STATS -->
-<section class="stats" id="stats">
-  <div class="aurora-bg">
-    <div class="aurora-1"></div>
-    <div class="aurora-2"></div>
-    <div class="aurora-3"></div>
-  </div>
-  <div class="stats-inner">
-    <span class="section-label">By the numbers</span>
-    <h2 class="section-title" style="margin-bottom: 64px;">Scale that speaks for itself</h2>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-number" data-target="10000" data-suffix="+">0</div>
-        <div class="stat-label">Businesses Powered</div>
-        <div class="stat-divider"></div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="2.4" data-suffix="B+" data-decimal="true">0</div>
-        <div class="stat-label">AI Decisions Daily</div>
-        <div class="stat-divider"></div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="99.9" data-suffix="%" data-decimal="true">0</div>
-        <div class="stat-label">Uptime SLA</div>
-        <div class="stat-divider"></div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="150" data-suffix="+">0</div>
-        <div class="stat-label">Countries</div>
-        <div class="stat-divider"></div>
-      </div>
-    </div>
+<!-- STATS -->
+<section id="stats">
+  <div class="section-label">By The Numbers</div>
+  <h2 class="section-title">Trusted at Scale</h2>
+  <div class="stats-grid">
+    <div class="stat-item"><div class="stat-num" data-target="10000">0</div><div class="stat-label">Businesses Powered</div></div>
+    <div class="stat-item"><div class="stat-num" data-target="2400000000" data-suffix="B+">0</div><div class="stat-label">AI Decisions Daily</div></div>
+    <div class="stat-item"><div class="stat-num" data-target="99.9" data-suffix="%">0</div><div class="stat-label">Uptime SLA</div></div>
+    <div class="stat-item"><div class="stat-num" data-target="150" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
   </div>
 </section>
 
-<!-- SECTION 4 — HOW IT WORKS -->
-<section class="how-it-works" id="how">
-  <div class="how-header">
-    <span class="section-label">How it works</span>
-    <h2 class="section-title">Three steps to<br>AI transformation</h2>
-  </div>
-  <div class="how-track" id="howTrack">
-    <div class="how-panel">
-      <div class="how-step-num">01</div>
-      <div class="how-panel-content">
-        <div class="how-icon">🔌</div>
-        <h3>Connect</h3>
-        <p>Integrate your existing tools in minutes with 200+ pre-built connectors. No engineering team required — just plug in and go.</p>
-      </div>
-      <div class="how-connector"></div>
-    </div>
-    <div class="how-panel">
-      <div class="how-step-num">02</div>
-      <div class="how-panel-content">
-        <div class="how-icon">⚙️</div>
-        <h3>Configure</h3>
-        <p>Customize AI behavior with no-code workflows. Set rules, define outcomes, and let the intelligence adapt to your business logic.</p>
-      </div>
-      <div class="how-connector"></div>
-    </div>
-    <div class="how-panel">
-      <div class="how-step-num">03</div>
-      <div class="how-panel-content">
-        <div class="how-icon">📈</div>
-        <h3>Grow</h3>
-        <p>Watch every decision get smarter, automatically. Our models learn from your data, improve over time, and scale without limits.</p>
-      </div>
-    </div>
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">Process</div>
+  <h2 class="section-title">Three Steps to AI Transformation</h2>
+  <p class="section-sub">From zero to AI-powered in under 48 hours. No engineers required.</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-icon">🔌</div><h3>Connect</h3><p>Plug into your existing tools with 200+ pre-built connectors. Works with everything you already use.</p></div>
+    <div class="step"><div class="step-num">02</div><div class="step-icon">⚙️</div><h3>Configure</h3><p>Customize AI behavior for your business with our no-code workflow builder. No engineers needed.</p></div>
+    <div class="step"><div class="step-num">03</div><div class="step-icon">📈</div><h3>Grow</h3><p>Watch every decision get smarter automatically. AI learns from your data and improves every day.</p></div>
   </div>
 </section>
 
-<!-- SECTION 5 — INDUSTRIES -->
-<section class="industries" id="industries">
-  <span class="section-label">Industries</span>
-  <h2 class="section-title">Built for every sector</h2>
-  <p class="section-desc">Purpose-built AI solutions for the world's most demanding industries.</p>
-  <div class="bento-grid">
-    <div class="bento-tile large tile-healthcare">
-      <div class="tile-icon">🏥</div>
-      <h3>Healthcare</h3>
-      <p>Accelerate diagnostics, optimize patient pathways, and reduce administrative burden with HIPAA-compliant AI.</p>
-    </div>
-    <div class="bento-tile large tile-finance">
-      <div class="tile-icon">🏦</div>
-      <h3>Finance</h3>
-      <p>Real-time fraud detection, algorithmic risk modeling, and intelligent compliance across global markets.</p>
-    </div>
-    <div class="bento-tile tile-retail">
-      <div class="tile-icon">🛒</div>
-      <h3>Retail</h3>
-      <p>Hyper-personalized commerce at scale.</p>
-    </div>
-    <div class="bento-tile tile-manufacturing">
-      <div class="tile-icon">🏭</div>
-      <h3>Manufacturing</h3>
-      <p>Predictive maintenance, zero downtime.</p>
-    </div>
-    <div class="bento-tile tile-education">
-      <div class="tile-icon">🎓</div>
-      <h3>Education</h3>
-      <p>Adaptive learning, intelligent tutoring.</p>
-    </div>
-    <div class="bento-tile tile-logistics">
-      <div class="tile-icon">🚚</div>
-      <h3>Logistics</h3>
-      <p>Route optimization, demand forecasting.</p>
-    </div>
+<!-- INDUSTRIES -->
+<section id="industries">
+  <div class="section-label">Industries</div>
+  <h2 class="section-title">Built for Every Business</h2>
+  <p class="section-sub">Whether you're a 10-person startup or a Fortune 500, IADOPT.AI scales to fit.</p>
+  <div class="industries-grid">
+    <div class="industry-tile"><div class="industry-icon">🏥</div><h3>Healthcare</h3><p>Streamline patient intake, automate compliance reporting</p></div>
+    <div class="industry-tile"><div class="industry-icon">🏦</div><h3>Finance</h3><p>Risk assessment, fraud detection, automated reporting</p></div>
+    <div class="industry-tile"><div class="industry-icon">🛒</div><h3>Retail</h3><p>Inventory AI, customer insights, demand forecasting</p></div>
+    <div class="industry-tile"><div class="industry-icon">🏭</div><h3>Manufacturing</h3><p>Predictive maintenance, quality control, supply chain</p></div>
+    <div class="industry-tile"><div class="industry-icon">🎓</div><h3>Education</h3><p>Personalized learning, admin automation, analytics</p></div>
+    <div class="industry-tile"><div class="industry-icon">🏠</div><h3>Real Estate</h3><p>Lead scoring, market analysis, automated outreach</p></div>
+    <div class="industry-tile"><div class="industry-icon">⚖️</div><h3>Legal</h3><p>Contract review, compliance checks, document AI</p></div>
+    <div class="industry-tile"><div class="industry-icon">🚚</div><h3>Logistics</h3><p>Route optimization, demand prediction, fleet AI</p></div>
   </div>
 </section>
 
-<!-- SECTION 6 — TESTIMONIALS -->
-<section class="testimonials" id="testimonials">
-  <span class="section-label">Testimonials</span>
-  <h2 class="section-title" style="margin-bottom: 64px;">Trusted by industry leaders</h2>
-  <div class="testimonial-stage" id="testimonialStage">
-
-    <div class="testimonial-card left-card" data-index="0">
-      <div class="testimonial-avatar">
-        <div class="avatar-gradient" style="background: linear-gradient(135deg, #6366F1, #EC4899);"></div>
-      </div>
-      <div class="testimonial-stars">★★★★★</div>
-      <p class="testimonial-quote">"IADOPT.AI reduced our hiring time by 73%. What used to take weeks now takes hours. The AI screening is shockingly accurate."</p>
-      <div class="testimonial-name">Sarah Chen</div>
-      <div class="testimonial-role">VP of People, TechCorp</div>
-    </div>
-
-    <div class="testimonial-card center" data-index="1">
-      <div class="testimonial-avatar">
-        <div class="avatar-gradient" style="background: linear-gradient(135deg, #22D3EE, #6366F1);"></div>
-      </div>
-      <div class="testimonial-stars">★★★★★</div>
-      <p class="testimonial-quote">"The analytics platform predicted a market shift three months before it happened. We repositioned early and captured $40M in new revenue."</p>
-      <div class="testimonial-name">Marcus Rodriguez</div>
-      <div class="testimonial-role">CFO, GlobalTrade Inc.</div>
-    </div>
-
-    <div class="testimonial-card right-card" data-index="2">
-      <div class="testimonial-avatar">
-        <div class="avatar-gradient" style="background: linear-gradient(135deg, #EC4899, #F59E0B);"></div>
-      </div>
-      <div class="testimonial-stars">★★★★★</div>
-      <p class="testimonial-quote">"We deployed IADOPT Chat across 12 regions in under a week. Customer satisfaction scores jumped 34% in the first month."</p>
-      <div class="testimonial-name">Aisha Okonkwo</div>
-      <div class="testimonial-role">CTO, NexGen Retail</div>
-    </div>
-
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-label">Social Proof</div>
+  <h2 class="section-title">Loved by 10,000+ Businesses</h2>
+  <p class="section-sub">Real results from real companies.</p>
+  <div class="testi-grid">
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"IADOPT Recruit cut our hiring time by 80%. We went from 6-week to 8-day hire cycles. The AI screening is scary accurate."</div><div class="testi-author"><div class="testi-avatar">S</div><div><div class="testi-name">Sarah K.</div><div class="testi-role">Head of Talent · GlobalTech</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"We replaced 5 separate tools with IADOPT. ROI in 3 weeks. The automation alone saves us 40 hours a week across the team."</div><div class="testi-author"><div class="testi-avatar">M</div><div><div class="testi-name">Marcus T.</div><div class="testi-role">CTO · FinEdge Capital</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"Customer satisfaction went from 67% to 94% after deploying IADOPT Chat. Our support team now handles 3x the volume."</div><div class="testi-author"><div class="testi-avatar">P</div><div><div class="testi-name">Priya M.</div><div class="testi-role">CEO · RetailNow</div></div></div></div>
   </div>
 </section>
 
-<!-- SECTION 7 — PRICING -->
-<section class="pricing" id="pricing">
-  <span class="section-label">Pricing</span>
-  <h2 class="section-title">Simple, transparent pricing</h2>
-  <p class="section-desc">Start free, scale infinitely. No hidden fees, no surprises.</p>
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Simple, Transparent Pricing</h2>
+  <p class="section-sub">Start free. Scale as you grow. No surprise bills.</p>
   <div class="pricing-grid">
-
     <div class="pricing-card">
-      <div class="pricing-plan">Starter</div>
-      <div class="pricing-price">$49</div>
-      <div class="pricing-period">per month</div>
+      <div class="pricing-tier">Starter</div>
+      <div class="pricing-price">$49<span>/mo</span></div>
+      <div class="pricing-desc">Perfect for small teams getting started with AI</div>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> 1 AI product</li>
-        <li><span class="check">✓</span> 10,000 API calls/mo</li>
-        <li><span class="check">✓</span> Email support</li>
-        <li><span class="check">✓</span> Basic analytics</li>
-        <li><span class="check">✓</span> 5 team members</li>
+        <li>Up to 5 users</li><li>3 IADOPT products</li><li>5,000 AI decisions/mo</li><li>Email support</li><li>Basic analytics</li>
       </ul>
-      <button class="pricing-btn outline">Get Started</button>
+      <button class="btn-pricing outlined">Start Free Trial</button>
     </div>
-
     <div class="pricing-card featured">
       <div class="pricing-badge">Most Popular</div>
-      <div class="pricing-plan">Growth</div>
-      <div class="pricing-price">$199</div>
-      <div class="pricing-period">per month</div>
+      <div class="pricing-tier">Growth</div>
+      <div class="pricing-price">$199<span>/mo</span></div>
+      <div class="pricing-desc">For growing teams that need the full AI suite</div>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> All 6 AI products</li>
-        <li><span class="check">✓</span> 500,000 API calls/mo</li>
-        <li><span class="check">✓</span> Priority support</li>
-        <li><span class="check">✓</span> Advanced analytics</li>
-        <li><span class="check">✓</span> Unlimited team members</li>
-        <li><span class="check">✓</span> Custom integrations</li>
+        <li>Unlimited users</li><li>All 6 IADOPT products</li><li>Unlimited AI decisions</li><li>Priority support 24/7</li><li>Advanced analytics</li><li>Custom workflows</li>
       </ul>
-      <button class="pricing-btn filled">Get Started</button>
+      <button class="btn-pricing filled">Get Started →</button>
     </div>
-
     <div class="pricing-card">
-      <div class="pricing-plan">Enterprise</div>
+      <div class="pricing-tier">Enterprise</div>
       <div class="pricing-price">Custom</div>
-      <div class="pricing-period">tailored to you</div>
+      <div class="pricing-desc">For large orgs that need dedicated infrastructure</div>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> Everything in Growth</li>
-        <li><span class="check">✓</span> Unlimited API calls</li>
-        <li><span class="check">✓</span> Dedicated success manager</li>
-        <li><span class="check">✓</span> On-premise deployment</li>
-        <li><span class="check">✓</span> Custom SLA</li>
-        <li><span class="check">✓</span> SOC 2 & HIPAA</li>
+        <li>Dedicated infrastructure</li><li>Custom AI training</li><li>White-label option</li><li>SLA guarantee</li><li>Dedicated success manager</li>
       </ul>
-      <button class="pricing-btn outline">Contact Sales</button>
+      <button class="btn-pricing outlined">Talk to Sales</button>
     </div>
-
   </div>
 </section>
 
-<!-- SECTION 8 — CTA -->
-<section class="cta-section" id="cta">
-  <canvas id="cta-canvas"></canvas>
-  <div class="cta-content">
-    <h2>Ready to lead the<br>AI revolution?</h2>
-    <p>Join 10,000+ businesses already powered by IADOPT.AI. Start transforming your operations today.</p>
-    <div class="hero-buttons">
-      <button class="btn-primary">Start Free Trial <span>→</span></button>
-      <button class="btn-outline">Talk to Sales</button>
-    </div>
+<!-- CTA -->
+<section id="cta">
+  <h2>Ready to lead the<br><span class="grad">AI revolution?</span></h2>
+  <p>Join 10,000+ businesses already powered by IADOPT.AI. Start free, no credit card required.</p>
+  <div class="cta-btns">
+    <button class="btn-primary">Start Free Trial →</button>
+    <button class="btn-secondary">Talk to Sales</button>
+  </div>
+  <div class="trust-badges">
+    <div class="badge"><span class="badge-icon">🔒</span>SOC2 Certified</div>
+    <div class="badge"><span class="badge-icon">🛡️</span>GDPR Compliant</div>
+    <div class="badge"><span class="badge-icon">✅</span>HIPAA Ready</div>
+    <div class="badge"><span class="badge-icon">💳</span>No credit card required</div>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer id="about">
+<footer>
   <div class="footer-top">
     <div class="footer-brand">
-      <div class="footer-logo"><span class="dot" style="width:6px;height:6px;background:var(--primary);border-radius:50%;display:inline-block;"></span> IADOPT.AI</div>
-      <p class="footer-tagline">The intelligence behind everything. Powering the next generation of business with AI.</p>
+      <div class="nav-logo">IADOPT.AI</div>
+      <p>The intelligence behind everything. AI-powered products for every business, every team, every industry.</p>
     </div>
-    <div class="footer-col">
-      <h4>Products</h4>
-      <a href="#">IADOPT Recruit</a>
-      <a href="#">IADOPT Chat</a>
-      <a href="#">IADOPT Analytics</a>
-      <a href="#">IADOPT Automate</a>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <a href="#">About</a>
-      <a href="#">Careers</a>
-      <a href="#">Blog</a>
-      <a href="#">Press</a>
-    </div>
-    <div class="footer-col">
-      <h4>Resources</h4>
-      <a href="#">Documentation</a>
-      <a href="#">API Reference</a>
-      <a href="#">Status</a>
-      <a href="#">Changelog</a>
-    </div>
-    <div class="footer-col">
-      <h4>Legal</h4>
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Security</a>
-      <a href="#">GDPR</a>
-    </div>
-    <div class="footer-newsletter">
-      <h4 style="font-family:var(--font-display);font-size:0.8rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Stay Updated</h4>
-      <p>Get the latest AI insights and product updates delivered weekly.</p>
-      <form class="newsletter-form" onsubmit="return false;">
-        <input type="email" placeholder="your@email.com" aria-label="Email address">
-        <button type="submit">Subscribe</button>
-      </form>
-    </div>
+    <div class="footer-col"><h4>Products</h4><a href="#">IADOPT Recruit</a><a href="#">IADOPT Chat</a><a href="#">IADOPT Analytics</a><a href="#">IADOPT Automate</a><a href="#">IADOPT Shield</a><a href="#">IADOPT CRM</a></div>
+    <div class="footer-col"><h4>Solutions</h4><a href="#">Healthcare</a><a href="#">Finance</a><a href="#">Retail</a><a href="#">Manufacturing</a><a href="#">Education</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Press</a><a href="#">Investors</a></div>
+    <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Security</a><a href="#">Compliance</a></div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2026 IADOPT.AI. All rights reserved.</div>
-    <div class="footer-socials">
-      <a href="#" aria-label="Twitter">𝕏</a>
-      <a href="#" aria-label="LinkedIn">in</a>
-      <a href="#" aria-label="GitHub">GH</a>
-      <a href="#" aria-label="YouTube">▶</a>
-    </div>
+    <p>© 2026 IADOPT.AI — All rights reserved</p>
+    <p>Built with ❤️ and AI</p>
   </div>
 </footer>
 
-</div>
-</div>
-
-<!-- ============================================
-     JAVASCRIPT — Three.js, GSAP, Interactions
-     ============================================ -->
 <script>
-/* ============================================
-   FORCE LOADER HIDE — always hides after 2s max
-   ============================================ */
-setTimeout(function() {
-  var loader = document.getElementById("loader");
-  if (loader) { loader.style.display = "none"; }
-  document.body.style.overflow = "";
-}, 2000);
-
-/* ============================================
-   GLOBALS
-   ============================================ */
-var isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent) || window.innerWidth < 768;
-var mouse = { x: 0, y: 0, nx: 0, ny: 0 };
-var scrollY = 0;
-
-/* ============================================
-   REGISTER GSAP PLUGINS
-   ============================================ */
-gsap.registerPlugin(ScrollTrigger);
-
-/* ============================================
-   PAGE LOADER
-   ============================================ */
-function runLoader() {
-  var tl = gsap.timeline();
-  tl.to('#loader .loader-text', { opacity: 1, duration: 0.4, ease: 'power2.out' })
-    .to('#loader .loader-bar', { opacity: 1, duration: 0.3 }, 0.2)
-    .to('#loader .loader-bar-fill', { width: '100%', duration: 0.8, ease: 'power2.inOut' }, 0.3)
-    .to('#loader .loader-text', { scale: 1.1, duration: 0.3, ease: 'power2.in' }, 1.0)
-    .to('#loader', { yPercent: -100, duration: 0.6, ease: 'power3.inOut' }, 1.1)
-    .set('#loader', { display: 'none' })
-    .call(initHeroAnimation);
-}
-
-/* ============================================
-   LENIS SMOOTH SCROLL
-   ============================================ */
-var lenis = new Lenis({
-  duration: 1.2,
-  easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
-  smoothWheel: true,
-  touchMultiplier: 2,
+// ── LOADER ───────────────────────────────────────────────
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    var loader = document.getElementById('loader');
+    loader.style.opacity = '0';
+    loader.style.transform = 'translateY(-100%)';
+    setTimeout(function(){ loader.style.display = 'none'; }, 600);
+  }, 1200);
 });
 
-lenis.on('scroll', function(e) {
-  scrollY = e.scroll;
-  ScrollTrigger.update();
-  updateScrollProgress();
-});
-
-function raf(time) {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
-}
-requestAnimationFrame(raf);
-
-gsap.ticker.lagSmoothing(0);
-
-/* ============================================
-   SCROLL PROGRESS
-   ============================================ */
-function updateScrollProgress() {
-  var scrollH = document.documentElement.scrollHeight - window.innerHeight;
-  var pct = scrollH > 0 ? (scrollY / scrollH) * 100 : 0;
-  document.getElementById('scroll-progress').style.width = pct + '%';
-}
-
-/* ============================================
-   CUSTOM CURSOR
-   ============================================ */
-if (!isMobile) {
-  var cursorOuter = document.querySelector('.cursor-outer');
-  var cursorInner = document.querySelector('.cursor-inner');
-  var cx = 0, cy = 0, ox = 0, oy = 0;
-
-  window.addEventListener('mousemove', function(e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    mouse.nx = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.ny = -(e.clientY / window.innerHeight) * 2 + 1;
-    cx = e.clientX;
-    cy = e.clientY;
-    cursorInner.style.transform = 'translate(' + cx + 'px, ' + cy + 'px) translate(-50%, -50%)';
-  }, { passive: true });
-
-  function animateCursor() {
-    ox += (cx - ox) * 0.12;
-    oy += (cy - oy) * 0.12;
-    cursorOuter.style.transform = 'translate(' + ox + 'px, ' + oy + 'px) translate(-50%, -50%)';
-    requestAnimationFrame(animateCursor);
-  }
-  animateCursor();
-
-  document.querySelectorAll('a, button, .product-card, .testimonial-card, .bento-tile, .pricing-card').forEach(function(el) {
-    el.addEventListener('mouseenter', function() { cursorOuter.classList.add('hovering'); });
-    el.addEventListener('mouseleave', function() { cursorOuter.classList.remove('hovering'); });
-  });
-
-  window.addEventListener('mousedown', function() { cursorOuter.classList.add('clicking'); });
-  window.addEventListener('mouseup', function() { cursorOuter.classList.remove('clicking'); });
-}
-
-/* ============================================
-   NAV SCROLL STATE + MOBILE TOGGLE
-   ============================================ */
-var nav = document.getElementById('main-nav');
+// ── SCROLL PROGRESS ──────────────────────────────────────
 window.addEventListener('scroll', function() {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
+  var prog = document.getElementById('progress');
+  var pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  prog.style.width = pct + '%';
 }, { passive: true });
 
-var navToggle = document.getElementById('navToggle');
-var navLinks = document.getElementById('navLinks');
-navToggle.addEventListener('click', function() {
-  navLinks.classList.toggle('open');
+// ── CUSTOM CURSOR ────────────────────────────────────────
+var dot = document.getElementById('cursor-dot');
+var ring = document.getElementById('cursor-ring');
+var rx = 0, ry = 0;
+document.addEventListener('mousemove', function(e) {
+  dot.style.left = e.clientX + 'px';
+  dot.style.top = e.clientY + 'px';
+  rx += (e.clientX - rx) * 0.12;
+  ry += (e.clientY - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+}, { passive: true });
+function animCursor(){ rx += (parseFloat(dot.style.left)||0 - rx)*0.12; ry += (parseFloat(dot.style.top)||0 - ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animCursor); }
+requestAnimationFrame(animCursor);
+document.querySelectorAll('a,button').forEach(function(el){
+  el.addEventListener('mouseenter',function(){ ring.style.width='60px'; ring.style.height='60px'; ring.style.background='rgba(99,102,241,0.1)'; });
+  el.addEventListener('mouseleave',function(){ ring.style.width='40px'; ring.style.height='40px'; ring.style.background='transparent'; });
 });
 
-/* ============================================
-   THREE.JS SCENE — wrapped in try/catch
-   ============================================ */
-(function initThree() {
-  try {
-    var canvas = document.getElementById('webgl-canvas');
-    var renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: !isMobile,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+// ── THREE.JS ─────────────────────────────────────────────
+try {
+  var canvas = document.getElementById('webgl');
+  var W = window.innerWidth, H = window.innerHeight;
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
 
-    var scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x02020f, 0.035);
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(75, W/H, 0.1, 200);
+  camera.position.z = 7;
 
-    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 8);
+  // Lights
+  scene.add(new THREE.AmbientLight(0x1a1a3e, 1));
+  var pl1 = new THREE.PointLight(0x6366F1, 4, 20); scene.add(pl1);
+  var pl2 = new THREE.PointLight(0xEC4899, 3, 15); pl2.position.set(4,3,2); scene.add(pl2);
+  var pl3 = new THREE.PointLight(0x22D3EE, 3, 15); pl3.position.set(-4,-3,2); scene.add(pl3);
 
-    /* Lights — replaces bloom post-processing */
-    scene.add(new THREE.AmbientLight(0x1a1a2e, 0.5));
-    var pointLight1 = new THREE.PointLight(0x6366F1, 3, 20);
-    pointLight1.position.set(2, 3, 4);
-    scene.add(pointLight1);
-    var pointLight2 = new THREE.PointLight(0xEC4899, 2, 15);
-    pointLight2.position.set(-3, -2, 3);
-    scene.add(pointLight2);
-    var pointLight3 = new THREE.PointLight(0x22D3EE, 2, 15);
-    pointLight3.position.set(3, 2, 2);
-    scene.add(pointLight3);
+  // Central orb
+  var orb = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.2, 5),
+    new THREE.MeshStandardMaterial({ color:0x6366F1, emissive:0x6366F1, emissiveIntensity:0.3, metalness:0.9, roughness:0.1 })
+  );
+  scene.add(orb);
+  var wire = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.35, 2),
+    new THREE.MeshBasicMaterial({ color:0x8B5CF6, wireframe:true, transparent:true, opacity:0.25 })
+  );
+  scene.add(wire);
 
-    /* STARFIELD */
-    var starGeo = new THREE.BufferGeometry();
-    var starCount = 1000;
-    var starPos = new Float32Array(starCount * 3);
-    for (var si = 0; si < starCount * 3; si++) {
-      starPos[si] = (Math.random() - 0.5) * 80;
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    var starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, sizeAttenuation: true, transparent: true, opacity: 0.7 });
-    scene.add(new THREE.Points(starGeo, starMat));
+  // Rings
+  var rings = [];
+  [[0,0,0],[Math.PI/2,0,0],[Math.PI/4,Math.PI/4,0]].forEach(function(rot,i){
+    var r = new THREE.Mesh(
+      new THREE.TorusGeometry(2.2+i*0.5, 0.018, 8, 100),
+      new THREE.MeshBasicMaterial({ color:[0x6366F1,0xEC4899,0x22D3EE][i], transparent:true, opacity:0.7 })
+    );
+    r.rotation.set(rot[0],rot[1],rot[2]);
+    scene.add(r); rings.push(r);
+  });
 
-    /* NEBULA PLANES */
-    function nebulaMat(color, opacity) {
-      return new THREE.MeshBasicMaterial({
-        color: color, transparent: true, opacity: opacity, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
-      });
-    }
-    function nPlane(size, pos, col, op) {
-      var g = new THREE.PlaneGeometry(size, size);
-      var m = nebulaMat(col, op);
-      var mesh = new THREE.Mesh(g, m);
-      mesh.position.set(pos[0], pos[1], pos[2]);
-      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-      scene.add(mesh);
-      return mesh;
-    }
-    var nebulae = [
-      nPlane(18, [-8, 4, -20], 0x6366F1, 0.03),
-      nPlane(22, [10, -5, -25], 0x8B5CF6, 0.025),
-      nPlane(16, [0, 0, -30], 0xEC4899, 0.02)
-    ];
-
-    /* AI BRAIN ORB */
-    var orbGroup = new THREE.Group();
-    scene.add(orbGroup);
-
-    var coreMat = new THREE.MeshStandardMaterial({
-      color: 0x6366F1,
-      emissive: 0x6366F1,
-      emissiveIntensity: 0.8,
-      roughness: 0.2,
-      metalness: 0.6,
-      transparent: true,
-      opacity: 0.9,
-    });
-    var core = new THREE.Mesh(new THREE.SphereGeometry(0.8, 64, 64), coreMat);
-    orbGroup.add(core);
-
-    var glowMat = new THREE.MeshBasicMaterial({
-      color: 0x8B5CF6,
-      transparent: true,
-      opacity: 0.15,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-    });
-    orbGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), glowMat));
-
-    /* Orbiting rings */
-    var ringData = [
-      { radius: 1.6, tube: 0.015, rotX: 0.3, rotY: 0, speed: 0.3, color: 0x22D3EE },
-      { radius: 2.0, tube: 0.012, rotX: 1.2, rotY: 0.8, speed: -0.2, color: 0x8B5CF6 },
-      { radius: 2.4, tube: 0.01, rotX: 0.7, rotY: 1.5, speed: 0.15, color: 0xEC4899 },
-    ];
-    var rings = ringData.map(function(r) {
-      var geo = new THREE.TorusGeometry(r.radius, r.tube, 16, 100);
-      var mat = new THREE.MeshBasicMaterial({ color: r.color, transparent: true, opacity: 0.6 });
-      var mesh = new THREE.Mesh(geo, mat);
-      mesh.rotation.x = r.rotX;
-      mesh.rotation.y = r.rotY;
-      mesh.userData.speed = r.speed;
-      orbGroup.add(mesh);
-      return mesh;
-    });
-
-    /* Satellite spheres */
-    var satelliteCount = isMobile ? 80 : 200;
-    var satPositions = [];
-    var satPhases = [];
-    var satSpeeds = [];
-    var satMeshes = [];
-    var satGeo = new THREE.SphereGeometry(0.04, 8, 8);
-    var satMat = new THREE.MeshBasicMaterial({ color: 0x22D3EE, transparent: true, opacity: 0.7 });
-
-    for (var i = 0; i < satelliteCount; i++) {
-      var mesh = new THREE.Mesh(satGeo, satMat.clone());
-      var radius = 1.8 + Math.random() * 1.5;
-      var theta = Math.random() * Math.PI * 2;
-      var phi = Math.acos(2 * Math.random() - 1);
-      var phaseOffset = Math.random() * Math.PI * 2;
-      var speed = 0.1 + Math.random() * 0.3;
-      satPositions.push({ radius: radius, theta: theta, phi: phi });
-      satPhases.push(phaseOffset);
-      satSpeeds.push(speed);
-      satMeshes.push(mesh);
-      orbGroup.add(mesh);
-    }
-
-    /* Line connections */
-    var lineGeo = new THREE.BufferGeometry();
-    var linePositions = new Float32Array(satelliteCount * satelliteCount * 6);
-    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-    var lineMat = new THREE.LineBasicMaterial({ color: 0x6366F1, transparent: true, opacity: 0.12 });
-    var lines = new THREE.LineSegments(lineGeo, lineMat);
-    orbGroup.add(lines);
-
-    /* PARTICLE SYSTEM — Custom shader */
-    var PARTICLE_COUNT = isMobile ? 1000 : 5000;
-    var particleGeo = new THREE.BufferGeometry();
-    var pPositions = new Float32Array(PARTICLE_COUNT * 3);
-    var pOffsets = new Float32Array(PARTICLE_COUNT);
-    var pSizes = new Float32Array(PARTICLE_COUNT);
-
-    for (var pi = 0; pi < PARTICLE_COUNT; pi++) {
-      pPositions[pi * 3] = (Math.random() - 0.5) * 30;
-      pPositions[pi * 3 + 1] = (Math.random() - 0.5) * 30;
-      pPositions[pi * 3 + 2] = (Math.random() - 0.5) * 30;
-      pOffsets[pi] = Math.random() * Math.PI * 2;
-      pSizes[pi] = Math.random() * 2 + 0.5;
-    }
-
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
-    particleGeo.setAttribute('aOffset', new THREE.BufferAttribute(pOffsets, 1));
-    particleGeo.setAttribute('aSize', new THREE.BufferAttribute(pSizes, 1));
-
-    var particleMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-        uMouse: { value: new THREE.Vector2(0, 0) },
-        uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
-      },
-      vertexShader: [
-        'attribute float aOffset;',
-        'attribute float aSize;',
-        'uniform float uTime;',
-        'uniform vec2 uMouse;',
-        'uniform float uPixelRatio;',
-        'varying float vDist;',
-        'varying float vTwinkle;',
-        'void main() {',
-        '  vec3 pos = position;',
-        '  pos.x += sin(uTime * 0.1 + aOffset) * 0.3;',
-        '  pos.y += cos(uTime * 0.08 + aOffset * 1.3) * 0.3;',
-        '  pos.z += sin(uTime * 0.12 + aOffset * 0.7) * 0.2;',
-        '  vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);',
-        '  vec4 projected = projectionMatrix * mvPos;',
-        '  vec2 screenPos = projected.xy / projected.w;',
-        '  vec2 diff = screenPos - uMouse;',
-        '  float dist = length(diff);',
-        '  if (dist < 0.3) {',
-        '    vec2 push = normalize(diff) * (0.3 - dist) * 2.0;',
-        '    pos.x += push.x;',
-        '    pos.y += push.y;',
-        '  }',
-        '  vDist = length(pos) / 15.0;',
-        '  vTwinkle = sin(uTime * 2.0 + aOffset * 6.283) * 0.5 + 0.5;',
-        '  vec4 finalPos = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);',
-        '  gl_Position = finalPos;',
-        '  gl_PointSize = aSize * uPixelRatio * (200.0 / -mvPos.z);',
-        '}'
-      ].join('\n'),
-      fragmentShader: [
-        'varying float vDist;',
-        'varying float vTwinkle;',
-        'void main() {',
-        '  float d = length(gl_PointCoord - 0.5) * 2.0;',
-        '  if (d > 1.0) discard;',
-        '  float alpha = (1.0 - d) * (0.3 + vTwinkle * 0.5);',
-        '  vec3 cyan = vec3(0.133, 0.827, 0.933);',
-        '  vec3 purple = vec3(0.545, 0.361, 0.965);',
-        '  vec3 color = mix(cyan, purple, vDist);',
-        '  gl_FragColor = vec4(color, alpha);',
-        '}'
-      ].join('\n'),
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-
-    var particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
-    /* SCROLL-DRIVEN CAMERA (GSAP) */
-    var cameraPositions = [
-      { x: 0, y: 0, z: 8 },
-      { x: 4, y: 1.5, z: 5 },
-      { x: 0, y: 3, z: 12 },
-      { x: -5, y: 0, z: 6 },
-      { x: 0, y: 0, z: 9 },
-      { x: 2, y: -1, z: 7 },
-      { x: 0, y: 0, z: 8 },
-      { x: 0, y: 0, z: 10 },
-    ];
-    var camState = { x: 0, y: 0, z: 8, lookX: 0, lookY: 0, lookZ: 0 };
-    var sections = ['#hero', '#products', '#stats', '#how', '#industries', '#testimonials', '#pricing', '#cta'];
-
-    sections.forEach(function(sel, i) {
-      if (!document.querySelector(sel)) return;
-      var target = cameraPositions[i] || cameraPositions[0];
-      gsap.to(camState, {
-        x: target.x,
-        y: target.y,
-        z: target.z,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sel,
-          start: 'top bottom',
-          end: 'top top',
-          scrub: 1,
-        },
-      });
-    });
-
-    /* THREE.JS RENDER LOOP */
-    var clock = new THREE.Clock();
-
-    function animate() {
-      requestAnimationFrame(animate);
-
-      var t = clock.getElapsedTime();
-
-      camera.position.set(camState.x, camState.y, camState.z);
-      camera.lookAt(0, 0, 0);
-
-      // Orb breathe + rotate
-      var breathe = 1 + Math.sin(t * 0.8) * 0.05;
-      orbGroup.scale.set(breathe, breathe, breathe);
-      orbGroup.rotation.y = t * 0.1;
-      orbGroup.rotation.x = Math.sin(t * 0.05) * 0.1;
-
-      // Rings
-      rings.forEach(function(ring) {
-        ring.rotation.z += ring.userData.speed * 0.01;
-      });
-
-      // Satellites orbit
-      var lineIdx = 0;
-      var worldPositions = [];
-
-      for (var i = 0; i < satelliteCount; i++) {
-        var s = satPositions[i];
-        var phase = satPhases[i];
-        var spd = satSpeeds[i];
-        var th = s.theta + t * spd + phase;
-        var ph = s.phi + Math.sin(t * 0.3 + phase) * 0.2;
-        var sx = s.radius * Math.sin(ph) * Math.cos(th);
-        var sy = s.radius * Math.sin(ph) * Math.sin(th);
-        var sz = s.radius * Math.cos(ph);
-        satMeshes[i].position.set(sx, sy, sz);
-        worldPositions.push(new THREE.Vector3(sx, sy, sz));
-        satMeshes[i].material.opacity = 0.4 + Math.sin(t * 3 + phase) * 0.3;
-      }
-
-      // Line connections
-      var posArr = lines.geometry.attributes.position.array;
-      lineIdx = 0;
-      var connectionDist = 1.2;
-      var maxLines = Math.floor(posArr.length / 6);
-
-      for (var li = 0; li < satelliteCount && lineIdx < maxLines; li++) {
-        for (var lj = li + 1; lj < satelliteCount && lineIdx < maxLines; lj++) {
-          var d = worldPositions[li].distanceTo(worldPositions[lj]);
-          if (d < connectionDist) {
-            var base = lineIdx * 6;
-            posArr[base] = worldPositions[li].x;
-            posArr[base + 1] = worldPositions[li].y;
-            posArr[base + 2] = worldPositions[li].z;
-            posArr[base + 3] = worldPositions[lj].x;
-            posArr[base + 4] = worldPositions[lj].y;
-            posArr[base + 5] = worldPositions[lj].z;
-            lineIdx++;
-          }
-        }
-      }
-
-      for (var zi = lineIdx * 6; zi < Math.min((lineIdx + 10) * 6, posArr.length); zi++) {
-        posArr[zi] = 0;
-      }
-      lines.geometry.setDrawRange(0, lineIdx * 2);
-      lines.geometry.attributes.position.needsUpdate = true;
-
-      // Particles
-      particleMat.uniforms.uTime.value = t;
-      particleMat.uniforms.uMouse.value.set(mouse.nx, mouse.ny);
-
-      // Nebulae
-      nebulae.forEach(function(n, ni) {
-        n.rotation.z += 0.0003 * (ni % 2 === 0 ? 1 : -1);
-      });
-
-      // Moving point lights for glow effect
-      pointLight1.position.x = Math.sin(t * 0.5) * 3;
-      pointLight1.position.y = Math.cos(t * 0.3) * 3;
-
-      renderer.render(scene, camera);
-    }
-
-    animate();
-
-    /* WINDOW RESIZE */
-    window.addEventListener('resize', function() {
-      var w = window.innerWidth;
-      var h = window.innerHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-      particleMat.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio, 2);
-    }, { passive: true });
-
-  } catch(e) {
-    console.warn("Three.js failed, using CSS fallback:", e);
-    var c = document.getElementById('webgl-canvas');
-    if (c) {
-      c.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%, #6366F130 0%, #02020F 70%);';
-    }
+  // Satellites
+  var sats = [];
+  var satMesh = new THREE.SphereGeometry(0.05, 5, 5);
+  for(var i=0;i<120;i++){
+    var s = new THREE.Mesh(satMesh, new THREE.MeshBasicMaterial({color:i%3===0?0x22D3EE:i%3===1?0x8B5CF6:0xEC4899}));
+    s.userData = { theta:Math.random()*Math.PI*2, phi:Math.acos(2*Math.random()-1), r:1.8+Math.random()*1.8, spd:0.003+Math.random()*0.01, ph:Math.random()*Math.PI*2 };
+    scene.add(s); sats.push(s);
   }
-})();
 
-/* ============================================
-   HERO TEXT ANIMATION — Character split
-   ============================================ */
-function initHeroAnimation() {
-  var title = document.getElementById('hero-title');
-  if (!title) return;
-  var text = title.textContent;
-  title.innerHTML = '';
-  text.split('').forEach(function(ch) {
-    var span = document.createElement('span');
-    span.className = 'char';
-    span.textContent = ch === ' ' ? '\u00A0' : ch;
-    title.appendChild(span);
-  });
+  // Particles
+  var pN = window.innerWidth < 768 ? 600 : 2500;
+  var pPos = new Float32Array(pN*3);
+  for(var i=0;i<pN*3;i++) pPos[i]=(Math.random()-0.5)*40;
+  var pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+  var pts = new THREE.Points(pGeo, new THREE.PointsMaterial({color:0x6366F1,size:0.06,transparent:true,opacity:0.5}));
+  scene.add(pts);
 
-  gsap.to('.hero .char', {
-    opacity: 1,
-    y: 0,
-    rotateX: 0,
-    duration: 0.8,
-    stagger: 0.04,
-    ease: 'power3.out',
-    delay: 0.1,
-  });
+  // Mouse
+  var mx = 0, my = 0;
+  document.addEventListener('mousemove',function(e){ mx=(e.clientX/W-0.5)*2; my=-(e.clientY/H-0.5)*2; },{passive:true});
+  window.addEventListener('resize',function(){ W=window.innerWidth; H=window.innerHeight; camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); });
 
-  gsap.from('.hero-badge', { opacity: 0, y: -20, duration: 0.6, ease: 'power2.out', delay: 0 });
-  gsap.from('.hero-subtitle', { opacity: 0, y: 30, duration: 0.7, ease: 'power2.out', delay: 0.6 });
-  gsap.from('.hero-desc', { opacity: 0, y: 20, duration: 0.6, ease: 'power2.out', delay: 0.8 });
-  gsap.from('.hero-buttons', { opacity: 0, y: 20, duration: 0.6, ease: 'power2.out', delay: 1.0 });
-  gsap.from('.scroll-indicator', { opacity: 0, duration: 0.8, delay: 1.4 });
+  var t = 0;
+  var targetRotX = 0, targetRotY = 0, curRotX = 0, curRotY = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.008;
+
+    // Orb breathe
+    var s = 1 + Math.sin(t*0.9)*0.04;
+    orb.scale.setScalar(s); wire.scale.setScalar(s);
+    orb.rotation.y += 0.004; wire.rotation.y -= 0.003; wire.rotation.x += 0.002;
+
+    // Rings
+    rings[0].rotation.z += 0.005;
+    rings[1].rotation.x += 0.004;
+    rings[2].rotation.y += 0.003;
+
+    // Satellites
+    sats.forEach(function(s){ s.userData.theta+=s.userData.spd; var d=s.userData; s.position.set(d.r*Math.sin(d.phi)*Math.cos(d.theta), d.r*Math.cos(d.phi)+Math.sin(t*0.5+d.ph)*0.3, d.r*Math.sin(d.phi)*Math.sin(d.theta)); });
+
+    // Particles drift
+    pts.rotation.y += 0.0002; pts.rotation.x += 0.0001;
+
+    // Moving lights
+    pl1.position.set(Math.sin(t*0.4)*4, Math.cos(t*0.3)*4, 3);
+
+    // Smooth mouse parallax
+    targetRotX = my*0.08; targetRotY = mx*0.08;
+    curRotX += (targetRotX-curRotX)*0.04;
+    curRotY += (targetRotY-curRotY)*0.04;
+    scene.rotation.x = curRotX; scene.rotation.y = curRotY;
+
+    // Scroll camera
+    var scrollPct = window.scrollY/(document.body.scrollHeight-window.innerHeight)||0;
+    camera.position.z = 7 - scrollPct*3;
+    camera.position.y = scrollPct*1.5;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+} catch(e) {
+  console.warn('WebGL unavailable:', e);
+  document.getElementById('webgl').style.background = 'radial-gradient(ellipse at 50% 30%, rgba(99,102,241,0.15) 0%, transparent 70%)';
 }
 
-/* ============================================
-   GSAP SCROLL ANIMATIONS
-   ============================================ */
+// ── GSAP SCROLL ANIMATIONS ────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
 
-// Product cards
+// Products cards
 gsap.utils.toArray('.product-card').forEach(function(card, i) {
-  gsap.to(card, {
-    opacity: 1,
-    y: 0,
-    duration: 0.8,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: card,
-      start: 'top 85%',
-      toggleActions: 'play none none reverse',
-    },
-    delay: i * 0.1,
+  gsap.to(card, { opacity:1, y:0, duration:0.7, ease:'power3.out', delay: i*0.1,
+    scrollTrigger:{ trigger:card, start:'top 85%' }
   });
 });
 
 // Stats
 gsap.utils.toArray('.stat-item').forEach(function(item, i) {
-  var numEl = item.querySelector('.stat-number');
+  gsap.to(item, { opacity:1, y:0, duration:0.7, delay:i*0.15,
+    scrollTrigger:{ trigger:item, start:'top 85%' }
+  });
+  var numEl = item.querySelector('.stat-num');
   var target = parseFloat(numEl.dataset.target);
-  var suffix = numEl.dataset.suffix || '';
-  var isDecimal = numEl.dataset.decimal === 'true';
+  var suffix = numEl.dataset.suffix || '+';
+  ScrollTrigger.create({ trigger:item, start:'top 85%', once:true, onEnter:function(){
+    var obj = {val:0};
+    gsap.to(obj, { val:target, duration:2, ease:'power2.out', onUpdate:function(){
+      var v = obj.val;
+      if(target >= 1000000000) numEl.textContent = (v/1000000000).toFixed(1) + 'B+';
+      else if(target >= 1000) numEl.textContent = Math.round(v/1000).toLocaleString() + ',000+';
+      else numEl.textContent = v.toFixed(target%1!==0?1:0) + suffix;
+    }});
+  }});
+});
 
-  gsap.to(item, {
-    opacity: 1, y: 0, duration: 0.8,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: item,
-      start: 'top 85%',
-      toggleActions: 'play none none reverse',
-    },
-    delay: i * 0.15,
-  });
-
-  var counter = { val: 0 };
-  gsap.to(counter, {
-    val: target,
-    duration: 2,
-    ease: 'power2.out',
-    scrollTrigger: {
-      trigger: item,
-      start: 'top 85%',
-      toggleActions: 'play none none reset',
-    },
-    delay: i * 0.15,
-    onUpdate: function() {
-      if (isDecimal) {
-        numEl.textContent = counter.val.toFixed(1) + suffix;
-      } else {
-        numEl.textContent = Math.floor(counter.val).toLocaleString() + suffix;
-      }
-    },
+// Steps
+gsap.utils.toArray('.step').forEach(function(el, i) {
+  gsap.to(el, { opacity:1, y:0, duration:0.8, delay:i*0.2,
+    scrollTrigger:{ trigger:el, start:'top 85%' }
   });
 });
 
-// How it works — horizontal scroll
-var howSection = document.querySelector('.how-it-works');
-var howTrack = document.getElementById('howTrack');
-if (howSection && howTrack) {
-  gsap.to(howTrack, {
-    x: function() { return -(howTrack.scrollWidth - window.innerWidth); },
-    ease: 'none',
-    scrollTrigger: {
-      trigger: howSection,
-      start: 'top top',
-      end: function() { return '+=' + (howTrack.scrollWidth - window.innerWidth); },
-      scrub: 1,
-      pin: true,
-      anticipatePin: 1,
-    },
-  });
-
-  gsap.utils.toArray('.how-panel-content').forEach(function(content) {
-    gsap.from(content, {
-      opacity: 0,
-      x: 60,
-      duration: 1,
-      scrollTrigger: {
-        trigger: content,
-        start: 'left 80%',
-        end: 'left 40%',
-        scrub: 1,
-        containerAnimation: gsap.getById && gsap.getById('howScroll'),
-      },
-    });
-  });
-}
-
-// Bento tiles
-gsap.utils.toArray('.bento-tile').forEach(function(tile, i) {
-  gsap.to(tile, {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    duration: 0.7,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: tile,
-      start: 'top 88%',
-      toggleActions: 'play none none reverse',
-    },
-    delay: i * 0.08,
+// Industry tiles
+gsap.utils.toArray('.industry-tile').forEach(function(el, i) {
+  gsap.to(el, { opacity:1, scale:1, duration:0.6, delay:i*0.07,
+    scrollTrigger:{ trigger:el, start:'top 90%' }
   });
 });
 
-// Pricing cards
-gsap.utils.toArray('.pricing-card').forEach(function(card, i) {
-  gsap.to(card, {
-    opacity: 1,
-    y: card.classList.contains('featured') ? -40 : 0,
-    duration: 0.8,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: card,
-      start: 'top 88%',
-      toggleActions: 'play none none reverse',
-    },
-    delay: i * 0.12,
+// Testimonials
+gsap.utils.toArray('.testi-card').forEach(function(el, i) {
+  gsap.to(el, { opacity:1, y:0, duration:0.8, delay:i*0.15,
+    scrollTrigger:{ trigger:el, start:'top 85%' }
   });
 });
 
-/* ============================================
-   TESTIMONIAL ROTATION
-   ============================================ */
-var testimonialCards = document.querySelectorAll('.testimonial-card');
-var currentTestimonial = 1;
-
-function rotateTestimonials() {
-  currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
-  testimonialCards.forEach(function(card, i) {
-    card.className = 'testimonial-card';
-    var offset = (i - currentTestimonial + testimonialCards.length) % testimonialCards.length;
-    if (offset === 0) card.classList.add('center');
-    else if (offset === testimonialCards.length - 1) card.classList.add('left-card');
-    else card.classList.add('right-card');
-  });
-}
-
-setInterval(rotateTestimonials, 4000);
-
-testimonialCards.forEach(function(card) {
-  card.addEventListener('click', function() {
-    if (!card.classList.contains('center')) {
-      currentTestimonial = parseInt(card.dataset.index);
-      testimonialCards.forEach(function(c, i) {
-        c.className = 'testimonial-card';
-        var offset = (i - currentTestimonial + testimonialCards.length) % testimonialCards.length;
-        if (offset === 0) c.classList.add('center');
-        else if (offset === testimonialCards.length - 1) c.classList.add('left-card');
-        else c.classList.add('right-card');
-      });
-    }
+// Pricing
+gsap.utils.toArray('.pricing-card').forEach(function(el, i) {
+  gsap.to(el, { opacity:1, y:0, duration:0.8, delay:i*0.15,
+    scrollTrigger:{ trigger:el, start:'top 85%' }
   });
 });
 
-gsap.to('.testimonial-card.center', {
-  y: -8,
-  duration: 2,
-  ease: 'sine.inOut',
-  yoyo: true,
-  repeat: -1,
-});
-
-/* ============================================
-   CTA PARTICLE BURST CANVAS
-   ============================================ */
-var ctaCanvas = document.getElementById('cta-canvas');
-if (ctaCanvas) {
-  var ctaCtx = ctaCanvas.getContext('2d');
-  var ctaParticles = [];
-  var ctaBurstTriggered = false;
-
-  function resizeCtaCanvas() {
-    var rect = ctaCanvas.parentElement.getBoundingClientRect();
-    ctaCanvas.width = rect.width;
-    ctaCanvas.height = rect.height;
-  }
-  resizeCtaCanvas();
-  window.addEventListener('resize', resizeCtaCanvas, { passive: true });
-
-  function CtaParticle(x, y) {
-    this.x = x;
-    this.y = y;
-    this.vx = (Math.random() - 0.5) * 6;
-    this.vy = (Math.random() - 0.5) * 6;
-    this.life = 1;
-    this.decay = 0.005 + Math.random() * 0.01;
-    this.size = Math.random() * 3 + 1;
-    this.color = ['#6366F1', '#8B5CF6', '#EC4899', '#22D3EE'][Math.floor(Math.random() * 4)];
-  }
-  CtaParticle.prototype.update = function() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.vx *= 0.99;
-    this.vy *= 0.99;
-    this.life -= this.decay;
-  };
-  CtaParticle.prototype.draw = function(ctx) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, this.life);
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  };
-
-  function burstParticles() {
-    var cx = ctaCanvas.width / 2;
-    var cy = ctaCanvas.height / 2;
-    for (var i = 0; i < 150; i++) {
-      ctaParticles.push(new CtaParticle(cx, cy));
-    }
-  }
-
-  function animateCtaCanvas() {
-    requestAnimationFrame(animateCtaCanvas);
-    ctaCtx.clearRect(0, 0, ctaCanvas.width, ctaCanvas.height);
-    ctaParticles = ctaParticles.filter(function(p) { return p.life > 0; });
-    ctaParticles.forEach(function(p) { p.update(); p.draw(ctaCtx); });
-  }
-  animateCtaCanvas();
-
-  ScrollTrigger.create({
-    trigger: '#cta',
-    start: 'top 60%',
-    onEnter: function() {
-      if (!ctaBurstTriggered) {
-        ctaBurstTriggered = true;
-        burstParticles();
-        var count = 0;
-        var interval = setInterval(function() {
-          if (count++ > 4) { clearInterval(interval); return; }
-          for (var i = 0; i < 30; i++) {
-            ctaParticles.push(new CtaParticle(
-              ctaCanvas.width / 2 + (Math.random() - 0.5) * 200,
-              ctaCanvas.height / 2 + (Math.random() - 0.5) * 200
-            ));
-          }
-        }, 600);
-      }
-    },
-  });
-}
-
-// CTA content animation
-gsap.from('.cta-content h2', {
-  opacity: 0, y: 40, duration: 0.8,
-  scrollTrigger: { trigger: '#cta', start: 'top 70%' },
-});
-gsap.from('.cta-content p', {
-  opacity: 0, y: 30, duration: 0.7, delay: 0.2,
-  scrollTrigger: { trigger: '#cta', start: 'top 70%' },
-});
-gsap.from('#cta .hero-buttons', {
-  opacity: 0, y: 20, duration: 0.6, delay: 0.4,
-  scrollTrigger: { trigger: '#cta', start: 'top 70%' },
-});
-
-/* ============================================
-   LOADER INIT
-   ============================================ */
-window.addEventListener('load', runLoader);
-
+// CTA
+gsap.to('#cta h2', { opacity:1, y:0, duration:1, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
+gsap.to('#cta p', { opacity:1, y:0, duration:1, delay:0.2, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
+gsap.to('.cta-btns', { opacity:1, y:0, duration:1, delay:0.4, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
+gsap.to('.trust-badges', { opacity:1, duration:1, delay:0.6, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
 </script>
-
 </body>
 </html>
