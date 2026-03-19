@@ -4,642 +4,1973 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IADOPT.AI — The Intelligence Behind Everything</title>
+<meta name="description" content="Deploy AI across your entire business. Ship in days, not months. IADOPT.AI — The Intelligence Behind Everything.">
+
+<!-- CDN: Three.js, GSAP, ScrollTrigger — regular script tags, no modules -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
+/* ============================================
+   RESET & VARIABLES
+   ============================================ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#000508;--p:#FFB300;--s:#FF3D00;--a:#00E5FF;--c:#FFD740;
-  --text:#E0F7FA;--muted:#546E7A;
-  --glass:rgba(0,229,255,0.05);
+
+:root {
+  --bg: #02020F;
+  --indigo: #6366F1;
+  --violet: #8B5CF6;
+  --pink: #EC4899;
+  --cyan: #22D3EE;
+  --text: #E2E8F0;
+  --muted: #64748B;
+  --glass: rgba(99,102,241,0.06);
+  --glass-border: rgba(99,102,241,0.15);
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
 
-/* LOADER */
-#loader{position:fixed;inset:0;background:#000508;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.6s,transform 0.6s}
-#loader h1{font-size:clamp(2rem,6vw,5rem);font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,#FFB300,#FF3D00,#00E5FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-#loader p{color:#546E7A;margin-top:8px;font-size:0.9rem;letter-spacing:4px;text-transform:uppercase}
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
 
-/* CANVAS */
-#webgl{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+@property --aurora-hue {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 5%;display:flex;align-items:center;justify-content:space-between;background:rgba(0,5,8,0.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,179,0,0.15)}
-.nav-logo{font-size:1.4rem;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.nav-links{display:flex;gap:32px}
-.nav-links a{color:var(--muted);font-size:0.9rem;transition:color 0.2s;text-decoration:none}
-.nav-links a:hover{color:var(--a)}
-.nav-cta{background:linear-gradient(135deg,var(--p),var(--s));border:none;color:#000;padding:10px 24px;border-radius:50px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity 0.2s,transform 0.2s}
-.nav-cta:hover{opacity:0.85;transform:translateY(-1px)}
-@media(max-width:768px){.nav-links{display:none}}
+html { scroll-behavior: smooth; }
 
-/* SECTIONS */
-section{position:relative;z-index:1;padding:120px 5%}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
 
-/* HERO */
-#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:80px;position:relative;overflow:hidden}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.3);border-radius:50px;padding:6px 16px;font-size:0.8rem;color:var(--p);margin-bottom:32px}
-.hero-badge span{width:6px;height:6px;background:var(--a);border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
-#hero h1{font-size:clamp(3rem,9vw,8rem);font-weight:900;letter-spacing:-3px;line-height:1;margin-bottom:24px}
-.grad{background:linear-gradient(135deg,var(--p),var(--s),var(--a),var(--c));background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradAnim 5s ease infinite}
-@keyframes gradAnim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-#hero p{font-size:clamp(1rem,2.5vw,1.3rem);color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:40px}
-.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
-.btn-primary{background:linear-gradient(135deg,var(--p),var(--s));border:none;color:#000;padding:16px 40px;border-radius:50px;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.3s;box-shadow:0 0 30px rgba(255,179,0,0.4)}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(255,179,0,0.6)}
-.btn-secondary{background:transparent;border:1px solid rgba(0,229,255,0.3);color:var(--a);padding:16px 40px;border-radius:50px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.3s}
-.btn-secondary:hover{border-color:var(--a);background:rgba(0,229,255,0.08);transform:translateY(-3px)}
-.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);font-size:0.8rem;animation:bounce 2s infinite}
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Orbitron', sans-serif;
+}
 
-/* HUD Corners */
-.hud-corner{position:absolute;width:40px;height:40px;border-color:#FFB300;border-style:solid;opacity:0.7;animation:hudPulse 3s ease-in-out infinite;z-index:2}
-.hud-tl{top:100px;left:5%;border-width:2px 0 0 2px}
-.hud-tr{top:100px;right:5%;border-width:2px 2px 0 0}
-.hud-bl{bottom:60px;left:5%;border-width:0 0 2px 2px}
-.hud-br{bottom:60px;right:5%;border-width:0 2px 2px 0}
-@keyframes hudPulse{0%,100%{opacity:0.4}50%{opacity:0.9}}
+/* ============================================
+   SCROLL PROGRESS BAR
+   ============================================ */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--indigo), var(--violet), var(--pink), var(--cyan));
+  z-index: 10000;
+  transition: width 0.05s linear;
+}
 
-/* Scan line */
-.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.6),transparent);animation:scanAnim 4s linear infinite;pointer-events:none;z-index:2}
-@keyframes scanAnim{0%{top:80px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+/* ============================================
+   CUSTOM CURSOR
+   ============================================ */
+.cursor-dot {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background 0.2s;
+}
+.cursor-ring {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(99,102,241,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s;
+}
+.cursor-hover .cursor-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--pink);
+}
+.cursor-hover .cursor-ring {
+  width: 50px;
+  height: 50px;
+  border-color: rgba(236,72,153,0.4);
+}
 
-/* HUD circles */
-.hud-circle{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,0.2);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:circleExpand 4s ease-out infinite;z-index:2}
-.hud-circle-1{width:300px;height:300px;animation-delay:0s}
-.hud-circle-2{width:500px;height:500px;animation-delay:2s}
-@keyframes circleExpand{0%{opacity:0.4;transform:translate(-50%,-50%) scale(0.8)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.3)}}
+@media (max-width: 768px) {
+  .cursor-dot, .cursor-ring { display: none; }
+  body { cursor: auto; }
+}
 
-/* HUD data readout */
-.hud-data{position:absolute;bottom:80px;right:5%;font-family:'Courier New',Courier,monospace;font-size:0.75rem;color:var(--a);text-align:left;z-index:2;opacity:0.7}
-.hud-data-line{margin-bottom:4px;letter-spacing:1px}
+/* ============================================
+   LOADER / OPENING SEQUENCE
+   ============================================ */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-/* SECTION HEADER */
-.section-label{font-size:0.8rem;letter-spacing:4px;text-transform:uppercase;color:var(--p);margin-bottom:16px}
-.section-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-1px;line-height:1.1;margin-bottom:20px}
-.section-sub{color:var(--muted);font-size:1.1rem;max-width:600px;line-height:1.7;margin-bottom:64px}
+.loader-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--cyan);
+  box-shadow: 0 0 20px var(--cyan), 0 0 60px var(--cyan);
+  opacity: 0;
+  transform: translateY(-10px);
+}
 
-/* PRODUCTS */
-#products{text-align:center}
-.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto}
-@media(max-width:900px){.products-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.products-grid{grid-template-columns:1fr}}
-.product-card{background:var(--glass);border:1px solid rgba(0,229,255,0.12);border-radius:20px;padding:32px;text-align:left;transition:all 0.4s;cursor:pointer;opacity:0;transform:translateY(40px)}
-.product-card:hover{background:rgba(255,179,0,0.06);border-color:rgba(255,179,0,0.4);transform:translateY(-8px)!important;box-shadow:0 20px 60px rgba(255,179,0,0.1)}
-.card-icon{font-size:2.5rem;margin-bottom:20px;display:block}
-.card-title{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--c)}
-.card-desc{color:var(--muted);font-size:0.9rem;line-height:1.6}
-.card-link{display:inline-flex;align-items:center;gap:6px;color:var(--a);font-size:0.85rem;font-weight:600;margin-top:16px;transition:gap 0.2s}
-.card-link:hover{gap:10px}
+.loader-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+.loader-title .letter {
+  opacity: 0;
+  display: inline-block;
+  color: #fff;
+}
+.loader-title .ai-suffix {
+  opacity: 0;
+  color: var(--cyan);
+  display: inline-block;
+}
+.loader-tagline {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--muted);
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: 16px;
+  opacity: 0;
+}
 
-/* STATS */
-#stats{text-align:center;background:radial-gradient(ellipse at 50% 50%,rgba(255,179,0,0.08) 0%,transparent 70%)}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;max-width:900px;margin:0 auto}
-@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-.stat-item{opacity:0;transform:translateY(30px)}
-.stat-num{font-size:clamp(2.5rem,5vw,4rem);font-weight:900;background:linear-gradient(135deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
-.stat-label{color:var(--muted);font-size:0.9rem;margin-top:8px}
+/* ============================================
+   CANVAS (Three.js)
+   ============================================ */
+#webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
 
-/* HOW IT WORKS */
-#how{text-align:center}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:1000px;margin:0 auto;position:relative}
-.steps::before{content:'';position:absolute;top:50px;left:calc(16.6% + 20px);width:calc(66.6% - 40px);height:2px;background:linear-gradient(90deg,var(--p),var(--s));opacity:0.4}
-@media(max-width:700px){.steps{grid-template-columns:1fr}.steps::before{display:none}}
-.step{opacity:0;transform:translateY(40px)}
-.step-num{font-size:5rem;font-weight:900;color:rgba(255,179,0,0.12);line-height:1;margin-bottom:16px}
-.step-icon{font-size:2rem;margin-bottom:16px}
-.step h3{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--c)}
-.step p{color:var(--muted);font-size:0.9rem;line-height:1.6}
+/* CSS fallback gradient if Three.js fails */
+.css-fallback-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(99,102,241,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 60%, rgba(139,92,246,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(34,211,238,0.06) 0%, transparent 50%),
+    var(--bg);
+  display: none;
+}
+.css-fallback-bg.active { display: block; }
 
-/* INDUSTRIES */
-#industries{text-align:center}
-.industries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px;margin:0 auto}
-@media(max-width:900px){.industries-grid{grid-template-columns:repeat(2,1fr)}}
-.industry-tile{background:var(--glass);border:1px solid rgba(0,229,255,0.1);border-radius:16px;padding:28px 20px;text-align:center;opacity:0;transform:scale(0.9);transition:all 0.3s;cursor:pointer}
-.industry-tile:hover{background:rgba(255,179,0,0.06);border-color:rgba(255,179,0,0.3);transform:scale(1.04)!important}
-.industry-icon{font-size:2.2rem;margin-bottom:12px}
-.industry-tile h3{font-size:1rem;font-weight:700;margin-bottom:6px;color:var(--c)}
-.industry-tile p{color:var(--muted);font-size:0.8rem;line-height:1.5}
+/* ============================================
+   NAV
+   ============================================ */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(2,2,15,0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  transform: translateY(-100%);
+}
 
-/* TESTIMONIALS */
-#testimonials{text-align:center}
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto}
-@media(max-width:800px){.testi-grid{grid-template-columns:1fr}}
-.testi-card{background:var(--glass);border:1px solid rgba(0,229,255,0.1);border-radius:20px;padding:32px;text-align:left;opacity:0;transform:translateY(40px)}
-.testi-stars{color:#FFB300;font-size:1rem;margin-bottom:16px}
-.testi-quote{font-size:1rem;line-height:1.7;margin-bottom:24px;color:var(--text)}
-.testi-author{display:flex;align-items:center;gap:12px}
-.testi-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:#000}
-.testi-name{font-weight:700;font-size:0.95rem}
-.testi-role{color:var(--muted);font-size:0.8rem}
+.nav-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--indigo), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-/* PRICING */
-#pricing{text-align:center}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:0 auto;align-items:start}
-@media(max-width:800px){.pricing-grid{grid-template-columns:1fr}}
-.pricing-card{background:var(--glass);border:1px solid rgba(0,229,255,0.1);border-radius:24px;padding:40px 32px;opacity:0;transform:translateY(40px);position:relative;transition:all 0.3s}
-.pricing-card:hover{transform:translateY(-8px)!important;box-shadow:0 20px 60px rgba(255,179,0,0.08)}
-.pricing-card.featured{background:rgba(255,179,0,0.06);border-color:var(--p);box-shadow:0 0 60px rgba(255,179,0,0.15)}
-.pricing-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--p),var(--s));color:#000;font-size:0.75rem;font-weight:700;padding:6px 20px;border-radius:50px;white-space:nowrap}
-.pricing-tier{font-size:0.85rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
-.pricing-price{font-size:3rem;font-weight:900;line-height:1;margin-bottom:8px;color:var(--c)}
-.pricing-price span{font-size:1rem;color:var(--muted);font-weight:400}
-.pricing-desc{color:var(--muted);font-size:0.9rem;margin-bottom:32px}
-.pricing-features{list-style:none;margin-bottom:32px;text-align:left}
-.pricing-features li{padding:8px 0;border-bottom:1px solid rgba(0,229,255,0.06);font-size:0.9rem;display:flex;align-items:center;gap:10px;color:var(--text)}
-.pricing-features li::before{content:'\2713';color:var(--a);font-weight:700;flex-shrink:0}
-.btn-pricing{width:100%;padding:14px;border-radius:50px;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.3s;border:none}
-.btn-pricing.outlined{background:transparent;border:1px solid rgba(0,229,255,0.25);color:var(--a)}
-.btn-pricing.outlined:hover{border-color:var(--p);background:rgba(255,179,0,0.08)}
-.btn-pricing.filled{background:linear-gradient(135deg,var(--p),var(--s));color:#000}
-.btn-pricing.filled:hover{opacity:0.85;transform:translateY(-2px)}
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+.nav-links a {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--cyan);
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a:hover::after { width: 100%; }
 
-/* CTA */
-#cta{text-align:center;padding:140px 5%;background:radial-gradient(ellipse at 50% 0%,rgba(255,179,0,0.1) 0%,transparent 60%)}
-#cta h2{font-size:clamp(2rem,6vw,4.5rem);font-weight:900;letter-spacing:-2px;margin-bottom:20px;opacity:0;transform:translateY(40px)}
-#cta p{color:var(--muted);font-size:1.1rem;margin-bottom:48px;opacity:0;transform:translateY(20px)}
-.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;transform:translateY(20px)}
-.trust-badges{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:48px;opacity:0}
-.badge{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:0.85rem}
-.badge-icon{color:var(--a)}
+.nav-cta {
+  font-family: 'Space Grotesk', sans-serif;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  border: none;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.nav-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(99,102,241,0.4);
+}
 
-/* FOOTER */
-footer{background:rgba(0,5,8,0.6);border-top:1px solid rgba(255,179,0,0.1);padding:60px 5% 30px}
-.footer-top{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:40px;margin-bottom:48px}
-@media(max-width:900px){.footer-top{grid-template-columns:1fr 1fr}}
-@media(max-width:500px){.footer-top{grid-template-columns:1fr}}
-.footer-brand p{color:var(--muted);font-size:0.9rem;line-height:1.6;margin-top:12px;max-width:240px}
-.footer-col h4{font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--p);margin-bottom:16px}
-.footer-col a{display:block;color:var(--muted);font-size:0.9rem;margin-bottom:10px;transition:color 0.2s;text-decoration:none}
-.footer-col a:hover{color:var(--a)}
-.footer-bottom{border-top:1px solid rgba(255,179,0,0.1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-.footer-bottom p{color:var(--muted);font-size:0.85rem}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+}
 
-/* SCROLL PROGRESS */
-#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--p),var(--s),var(--a));z-index:9999;width:0%;transition:none}
+/* ============================================
+   SECTIONS — GENERAL
+   ============================================ */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 120px 5%;
+}
 
-/* CURSOR */
-#cursor-dot{position:fixed;width:8px;height:8px;background:var(--a);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:none}
-#cursor-ring{position:fixed;width:40px;height:40px;border:1px solid rgba(0,229,255,0.5);border-radius:50%;pointer-events:none;z-index:9997;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s,background 0.2s}
-@media(max-width:768px){#cursor-dot,#cursor-ring{display:none}}
+.section-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--indigo);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--indigo);
+}
 
-/* FLOATING SHAPES */
-.float-shape{position:absolute;border-radius:50%;pointer-events:none;animation:floatAnim 6s ease-in-out infinite}
-@keyframes floatAnim{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(180deg)}}
+.section-heading {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
 
-/* HUD grid overlay on body */
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,0.015) 2px,rgba(0,229,255,0.015) 4px);pointer-events:none;z-index:0}
+.grad-text {
+  background: linear-gradient(135deg, var(--indigo), var(--violet), var(--pink), var(--cyan));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradShift 6s ease infinite;
+}
+
+@keyframes gradShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99,102,241,0.06);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  margin-bottom: 36px;
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.hero-badge .pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  animation: pulseDot 2s infinite;
+  box-shadow: 0 0 8px var(--cyan);
+}
+@keyframes pulseDot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.6); }
+}
+
+.hero-title {
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 900;
+  letter-spacing: -3px;
+  line-height: 1.05;
+  margin-bottom: 28px;
+}
+.hero-title .line1,
+.hero-title .line2 {
+  display: block;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 44px;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.hero-btns {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.btn-glow {
+  font-family: 'Space Grotesk', sans-serif;
+  position: relative;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  border: none;
+  color: #fff;
+  padding: 16px 36px;
+  border-radius: 60px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+  overflow: hidden;
+}
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 62px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet), var(--cyan));
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.btn-glow:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(99,102,241,0.5);
+}
+.btn-glow:hover::before { opacity: 1; }
+
+.btn-ghost {
+  font-family: 'Space Grotesk', sans-serif;
+  background: transparent;
+  border: 1px solid rgba(99,102,241,0.3);
+  color: var(--text);
+  padding: 16px 36px;
+  border-radius: 60px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: none;
+  transition: border-color 0.3s, background 0.3s, transform 0.3s;
+}
+.btn-ghost:hover {
+  border-color: var(--indigo);
+  background: rgba(99,102,241,0.08);
+  transform: translateY(-2px);
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 40px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  opacity: 0;
+  animation: scrollBounce 2s ease-in-out infinite;
+  animation-delay: 3s;
+}
+@keyframes scrollBounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ============================================
+   PRODUCTS
+   ============================================ */
+#products {
+  padding: 140px 5%;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+  margin: 60px auto 0;
+}
+
+.product-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 20px;
+  padding: 40px 32px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.4s,
+              box-shadow 0.4s;
+  will-change: transform;
+  opacity: 0;
+}
+.product-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  border-color: rgba(99,102,241,0.6);
+  box-shadow: 0 20px 60px rgba(99,102,241,0.2);
+}
+
+.product-icon {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  display: block;
+}
+.product-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+.product-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .products-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   STATS
+   ============================================ */
+#stats {
+  padding: 140px 5%;
+  position: relative;
+  overflow: hidden;
+}
+
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(236,72,153,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(34,211,238,0.08) 0%, transparent 50%);
+  animation: auroraShift 8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes auroraShift {
+  from { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  to { transform: scale(1.1) rotate(3deg); opacity: 1; }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  max-width: 1100px;
+  margin: 60px auto 0;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-item {
+  text-align: center;
+}
+.stat-number {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--indigo), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+}
+
+/* ============================================
+   HOW IT WORKS — HORIZONTAL SCROLL
+   ============================================ */
+#how {
+  padding: 0;
+  overflow: hidden;
+}
+
+.how-container {
+  display: flex;
+  width: 300vw;
+}
+
+.how-panel {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 10%;
+  position: relative;
+  overflow: hidden;
+}
+
+.how-panel-inner {
+  max-width: 600px;
+  position: relative;
+  z-index: 2;
+}
+
+.how-step-bg {
+  position: absolute;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(12rem, 25vw, 20rem);
+  font-weight: 900;
+  color: rgba(99,102,241,0.04);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.how-step-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  color: var(--cyan);
+  margin-bottom: 24px;
+}
+
+.how-panel h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.how-panel p {
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+/* ============================================
+   INDUSTRIES — BENTO GRID
+   ============================================ */
+#industries {
+  padding: 140px 5%;
+}
+
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 200px);
+  gap: 16px;
+  max-width: 1200px;
+  margin: 60px auto 0;
+}
+
+.bento-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.bento-item:hover {
+  border-color: rgba(99,102,241,0.4);
+  box-shadow: 0 8px 40px rgba(99,102,241,0.1);
+}
+
+.bento-item .bento-icon {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+.bento-item h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.bento-item p {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.bento-large { grid-column: span 2; }
+.bento-medium { grid-column: span 2; }
+
+@media (max-width: 768px) {
+  .bento {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+  .bento-large, .bento-medium { grid-column: span 1; }
+}
+
+/* ============================================
+   TESTIMONIALS
+   ============================================ */
+#testimonials {
+  padding: 140px 5%;
+  text-align: center;
+}
+
+.testimonial-container {
+  max-width: 900px;
+  margin: 60px auto 0;
+  position: relative;
+  height: 360px;
+}
+
+.testimonial-card {
+  position: absolute;
+  width: 380px;
+  max-width: 90vw;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 40px 32px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  text-align: left;
+}
+
+.testimonial-card.active {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.05);
+  opacity: 1;
+  z-index: 3;
+}
+.testimonial-card.left {
+  top: 50%;
+  left: 10%;
+  transform: translate(-50%, -50%) scale(0.92);
+  opacity: 0.5;
+  filter: blur(1px);
+  z-index: 1;
+}
+.testimonial-card.right {
+  top: 50%;
+  left: 90%;
+  transform: translate(-50%, -50%) scale(0.92);
+  opacity: 0.5;
+  filter: blur(1px);
+  z-index: 1;
+}
+
+.testimonial-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.testimonial-author {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.testimonial-role {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .testimonial-container { height: 320px; }
+  .testimonial-card { width: 300px; }
+  .testimonial-card.left { left: 5%; opacity: 0.3; }
+  .testimonial-card.right { left: 95%; opacity: 0.3; }
+}
+
+/* ============================================
+   PRICING
+   ============================================ */
+#pricing {
+  padding: 140px 5%;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 60px auto 0;
+  align-items: start;
+}
+
+.pricing-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 48px 36px;
+  text-align: center;
+  transition: transform 0.4s, box-shadow 0.4s;
+  position: relative;
+}
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(99,102,241,0.15);
+}
+
+.pricing-featured {
+  transform: translateY(-24px);
+  position: relative;
+  z-index: 2;
+  background: rgba(99,102,241,0.06);
+  border-color: transparent;
+}
+.pricing-featured:hover {
+  transform: translateY(-32px);
+}
+.pricing-featured::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 25px;
+  padding: 1.5px;
+  background: conic-gradient(from var(--angle), var(--indigo), var(--pink), var(--cyan), var(--indigo));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotateBorder 3s linear infinite;
+}
+@keyframes rotateBorder {
+  to { --angle: 360deg; }
+}
+
+.pricing-tier {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 20px;
+}
+
+.pricing-price {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.pricing-price .currency { font-size: 0.5em; vertical-align: super; color: var(--muted); }
+.pricing-period { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+
+.pricing-features {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 36px;
+}
+.pricing-features li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.9rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pricing-features li::before {
+  content: '→';
+  color: var(--indigo);
+  font-weight: 700;
+}
+
+.pricing-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  width: 100%;
+  padding: 14px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none;
+}
+.pricing-btn-outline {
+  background: transparent;
+  border: 1px solid rgba(99,102,241,0.3);
+  color: var(--text);
+}
+.pricing-btn-outline:hover {
+  border-color: var(--indigo);
+  background: rgba(99,102,241,0.08);
+}
+.pricing-btn-fill {
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  color: #fff;
+}
+.pricing-btn-fill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+}
+
+@media (max-width: 900px) {
+  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+  .pricing-featured { transform: none; }
+  .pricing-featured:hover { transform: translateY(-8px); }
+}
+
+/* ============================================
+   CTA
+   ============================================ */
+#cta {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 5%;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-heading {
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 32px;
+}
+
+.cta-sub {
+  color: var(--muted);
+  font-size: 1.15rem;
+  max-width: 500px;
+  line-height: 1.7;
+  margin-bottom: 44px;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+  position: relative;
+  z-index: 1;
+  padding: 60px 5% 40px;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--indigo), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+.footer-links a {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--cyan); }
+.footer-copy {
+  color: rgba(100,116,139,0.5);
+  font-size: 0.75rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* ============================================
+   UTILITY ANIMATIONS
+   ============================================ */
+.reveal { opacity: 0; transform: translateY(40px); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
-<body>
 
-<!-- LOADER -->
+<body>
+<!-- Scroll Progress -->
+<div id="scroll-progress"></div>
+
+<!-- Custom Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Loader / Opening Sequence -->
 <div id="loader">
-  <h1>IADOPT.AI</h1>
-  <p>The Intelligence Behind Everything</p>
+  <div class="loader-scan" id="loaderScan"></div>
+  <div class="loader-title" id="loaderTitle">
+    <span class="letter">I</span><span class="letter">A</span><span class="letter">D</span><span class="letter">O</span><span class="letter">P</span><span class="letter">T</span><span class="ai-suffix">.AI</span>
+  </div>
+  <p class="loader-tagline" id="loaderTagline">The Intelligence Behind Everything</p>
 </div>
 
-<!-- SCROLL PROGRESS -->
-<div id="progress"></div>
-
-<!-- CUSTOM CURSOR -->
-<div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
-
-<!-- WEBGL CANVAS -->
+<!-- Three.js Canvas -->
 <canvas id="webgl"></canvas>
+<!-- CSS Fallback if Three.js fails -->
+<div class="css-fallback-bg" id="cssFallback"></div>
 
 <!-- NAV -->
-<nav>
+<nav id="mainNav">
   <div class="nav-logo">IADOPT.AI</div>
   <div class="nav-links">
     <a href="#products">Products</a>
+    <a href="#stats">Impact</a>
     <a href="#how">How It Works</a>
     <a href="#pricing">Pricing</a>
-    <a href="#cta">Contact</a>
   </div>
-  <button class="nav-cta">Get Started Free</button>
+  <button class="nav-cta">Get Started</button>
 </nav>
 
-<!-- HERO -->
+<!-- ============================================
+     SECTION 1 — HERO
+     ============================================ -->
 <section id="hero">
-  <!-- HUD corners -->
-  <div class="hud-corner hud-tl"></div>
-  <div class="hud-corner hud-tr"></div>
-  <div class="hud-corner hud-bl"></div>
-  <div class="hud-corner hud-br"></div>
-
-  <!-- Scanning line -->
-  <div class="scan-line"></div>
-
-  <!-- HUD circles -->
-  <div class="hud-circle hud-circle-1"></div>
-  <div class="hud-circle hud-circle-2"></div>
-
-  <!-- Data readout -->
-  <div class="hud-data">
-    <div class="hud-data-line">SYS.STATUS: <span style="color:#00E5FF">ONLINE</span></div>
-    <div class="hud-data-line">POWER: <span style="color:#FFB300">ARC REACTOR</span></div>
-    <div class="hud-data-line">AI.CORE: <span style="color:#00E5FF">ACTIVE</span></div>
-    <div class="hud-data-line">VERSION: <span style="color:#FFD740">3.0.7</span></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      SYSTEM ONLINE &bull; v3.0
+    </div>
+    <h1 class="hero-title font-display">
+      <span class="line1">The Intelligence</span>
+      <span class="line2 grad-text">Behind Everything</span>
+    </h1>
+    <p class="hero-sub">Deploy AI across your entire business. Ship in days, not months.</p>
+    <div class="hero-btns">
+      <button class="btn-glow">Start Free &rarr;</button>
+      <button class="btn-ghost">Watch Demo &#9654;</button>
+    </div>
   </div>
-
-  <div class="hero-badge"><span></span>Now in Public Beta — Join 10,000+ businesses</div>
-  <h1>The Intelligence<br><span class="grad">Behind Everything</span></h1>
-  <p>Deploy AI across your entire business. Recruit smarter, automate deeper, grow faster. Ship in days, not months.</p>
-  <div class="hero-btns">
-    <button class="btn-primary">Start Free Trial →</button>
-    <button class="btn-secondary">Watch Demo ▶</button>
-  </div>
-  <div class="scroll-hint">
-    <span>Scroll to explore</span>
-    <span>↓</span>
-  </div>
+  <div class="hero-scroll">&darr; Scroll to explore</div>
 </section>
 
-<!-- PRODUCTS -->
+<!-- ============================================
+     SECTION 2 — PRODUCTS
+     ============================================ -->
 <section id="products">
-  <div class="section-label">Our Products</div>
-  <h2 class="section-title">AI That Powers Every Department</h2>
-  <p class="section-sub">Six specialized AI products, one unified platform. Each built to make your team 10x more effective.</p>
+  <div style="text-align:center;">
+    <div class="section-label" style="justify-content:center;"><span></span>PRODUCTS</div>
+    <h2 class="section-heading">AI for <span class="grad-text">Every Department</span></h2>
+    <p style="color:var(--muted);max-width:520px;margin:0 auto;line-height:1.7;">
+      Six intelligent products. One unified platform. Deploy enterprise-grade AI wherever it matters most.
+    </p>
+  </div>
   <div class="products-grid">
-    <div class="product-card"><span class="card-icon">🤖</span><div class="card-title">IADOPT Recruit</div><div class="card-desc">AI-powered hiring that screens, ranks and schedules candidates automatically. Cut time-to-hire by 80%.</div><div class="card-link">Learn more →</div></div>
-    <div class="product-card"><span class="card-icon">💬</span><div class="card-title">IADOPT Chat</div><div class="card-desc">Conversational AI for customer support, sales, and onboarding. Available 24/7, speaks 50+ languages.</div><div class="card-link">Learn more →</div></div>
-    <div class="product-card"><span class="card-icon">📊</span><div class="card-title">IADOPT Analytics</div><div class="card-desc">Predictive intelligence that spots trends before they happen. Turn data into decisions automatically.</div><div class="card-link">Learn more →</div></div>
-    <div class="product-card"><span class="card-icon">⚡</span><div class="card-title">IADOPT Automate</div><div class="card-desc">Build complex workflows with zero code. Connect 200+ tools and automate any business process.</div><div class="card-link">Learn more →</div></div>
-    <div class="product-card"><span class="card-icon">🛡️</span><div class="card-title">IADOPT Shield</div><div class="card-desc">AI-powered security and compliance. SOC2, GDPR, HIPAA ready. Detects threats before they strike.</div><div class="card-link">Learn more →</div></div>
-    <div class="product-card"><span class="card-icon">🔗</span><div class="card-title">IADOPT CRM</div><div class="card-desc">Intelligent customer relationships. AI scores leads, predicts churn, and suggests next best actions.</div><div class="card-link">Learn more →</div></div>
+    <div class="product-card">
+      <span class="product-icon">&#129302;</span>
+      <h3>IADOPT Recruit</h3>
+      <p>AI-powered hiring and talent acquisition. Screen thousands, find the perfect fit in minutes.</p>
+    </div>
+    <div class="product-card">
+      <span class="product-icon">&#128172;</span>
+      <h3>IADOPT Chat</h3>
+      <p>Conversational AI for customers. 24/7 multilingual support that learns and adapts in real-time.</p>
+    </div>
+    <div class="product-card">
+      <span class="product-icon">&#128202;</span>
+      <h3>IADOPT Analytics</h3>
+      <p>Predictive business intelligence. Turn raw data into actionable foresight.</p>
+    </div>
+    <div class="product-card">
+      <span class="product-icon">&#9889;</span>
+      <h3>IADOPT Automate</h3>
+      <p>Workflow automation engine. Eliminate repetitive tasks and reclaim thousands of hours.</p>
+    </div>
+    <div class="product-card">
+      <span class="product-icon">&#128737;&#65039;</span>
+      <h3>IADOPT Shield</h3>
+      <p>AI security and compliance. Enterprise-grade protection that evolves with the threat landscape.</p>
+    </div>
+    <div class="product-card">
+      <span class="product-icon">&#128279;</span>
+      <h3>IADOPT CRM</h3>
+      <p>Intelligent customer relations. Predict needs, personalize outreach, close faster.</p>
+    </div>
   </div>
 </section>
 
-<!-- STATS -->
+<!-- ============================================
+     SECTION 3 — STATS
+     ============================================ -->
 <section id="stats">
-  <div class="section-label">By The Numbers</div>
-  <h2 class="section-title">Trusted at Scale</h2>
+  <div class="aurora-bg"></div>
+  <div style="text-align:center;position:relative;z-index:2;">
+    <div class="section-label" style="justify-content:center;"><span></span>IMPACT</div>
+    <h2 class="section-heading">Numbers That <span class="grad-text">Speak</span></h2>
+  </div>
   <div class="stats-grid">
-    <div class="stat-item"><div class="stat-num" data-target="10000">0</div><div class="stat-label">Businesses Powered</div></div>
-    <div class="stat-item"><div class="stat-num" data-target="2400000000" data-suffix="B+">0</div><div class="stat-label">AI Decisions Daily</div></div>
-    <div class="stat-item"><div class="stat-num" data-target="99.9" data-suffix="%">0</div><div class="stat-label">Uptime SLA</div></div>
-    <div class="stat-item"><div class="stat-num" data-target="150" data-suffix="+">0</div><div class="stat-label">Countries</div></div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="2400" data-suffix="+">0</div>
+      <div class="stat-label">Enterprise Clients</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="99.9" data-suffix="%" data-decimal="true">0</div>
+      <div class="stat-label">Uptime SLA</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="14" data-suffix="M+">0</div>
+      <div class="stat-label">Tasks Automated / Mo</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="312" data-suffix="%">0</div>
+      <div class="stat-label">Avg. ROI</div>
+    </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
+<!-- ============================================
+     SECTION 4 — HOW IT WORKS
+     ============================================ -->
 <section id="how">
-  <div class="section-label">Process</div>
-  <h2 class="section-title">Three Steps to AI Transformation</h2>
-  <p class="section-sub">From zero to AI-powered in under 48 hours. No engineers required.</p>
-  <div class="steps">
-    <div class="step"><div class="step-num">01</div><div class="step-icon">🔌</div><h3>Connect</h3><p>Plug into your existing tools with 200+ pre-built connectors. Works with everything you already use.</p></div>
-    <div class="step"><div class="step-num">02</div><div class="step-icon">⚙️</div><h3>Configure</h3><p>Customize AI behavior for your business with our no-code workflow builder. No engineers needed.</p></div>
-    <div class="step"><div class="step-num">03</div><div class="step-icon">📈</div><h3>Grow</h3><p>Watch every decision get smarter automatically. AI learns from your data and improves every day.</p></div>
+  <div class="how-container">
+    <div class="how-panel">
+      <div class="how-step-bg">01</div>
+      <div class="how-panel-inner">
+        <div class="how-step-num">STEP 01 — CONNECT</div>
+        <h3 class="font-display">Plug Into Your <span class="grad-text">Ecosystem</span></h3>
+        <p>One API. 200+ integrations. Connect your CRM, ERP, databases, and communication tools in under 5 minutes. Zero downtime.</p>
+      </div>
+    </div>
+    <div class="how-panel">
+      <div class="how-step-bg">02</div>
+      <div class="how-panel-inner">
+        <div class="how-step-num">STEP 02 — CONFIGURE</div>
+        <h3 class="font-display">Train Your <span class="grad-text">AI Brain</span></h3>
+        <p>Our models learn your business language, processes, and patterns. Fine-tune with natural language — no ML team required.</p>
+      </div>
+    </div>
+    <div class="how-panel">
+      <div class="how-step-bg">03</div>
+      <div class="how-panel-inner">
+        <div class="how-step-num">STEP 03 — GROW</div>
+        <h3 class="font-display">Scale Without <span class="grad-text">Limits</span></h3>
+        <p>From 10 users to 10 million. Auto-scaling infrastructure that grows with your ambition. Pay only for what you use.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- INDUSTRIES -->
+<!-- ============================================
+     SECTION 5 — INDUSTRIES (Bento Grid)
+     ============================================ -->
 <section id="industries">
-  <div class="section-label">Industries</div>
-  <h2 class="section-title">Built for Every Business</h2>
-  <p class="section-sub">Whether you're a 10-person startup or a Fortune 500, IADOPT.AI scales to fit.</p>
-  <div class="industries-grid">
-    <div class="industry-tile"><div class="industry-icon">🏥</div><h3>Healthcare</h3><p>Streamline patient intake, automate compliance reporting</p></div>
-    <div class="industry-tile"><div class="industry-icon">🏦</div><h3>Finance</h3><p>Risk assessment, fraud detection, automated reporting</p></div>
-    <div class="industry-tile"><div class="industry-icon">🛒</div><h3>Retail</h3><p>Inventory AI, customer insights, demand forecasting</p></div>
-    <div class="industry-tile"><div class="industry-icon">🏭</div><h3>Manufacturing</h3><p>Predictive maintenance, quality control, supply chain</p></div>
-    <div class="industry-tile"><div class="industry-icon">🎓</div><h3>Education</h3><p>Personalized learning, admin automation, analytics</p></div>
-    <div class="industry-tile"><div class="industry-icon">🏠</div><h3>Real Estate</h3><p>Lead scoring, market analysis, automated outreach</p></div>
-    <div class="industry-tile"><div class="industry-icon">⚖️</div><h3>Legal</h3><p>Contract review, compliance checks, document AI</p></div>
-    <div class="industry-tile"><div class="industry-icon">🚚</div><h3>Logistics</h3><p>Route optimization, demand prediction, fleet AI</p></div>
+  <div style="text-align:center;">
+    <div class="section-label" style="justify-content:center;"><span></span>INDUSTRIES</div>
+    <h2 class="section-heading">Built for <span class="grad-text">Your World</span></h2>
+  </div>
+  <div class="bento">
+    <div class="bento-item bento-large">
+      <span class="bento-icon">&#127973;</span>
+      <h4>Healthcare</h4>
+      <p>Diagnostics, patient triage, records automation</p>
+    </div>
+    <div class="bento-item">
+      <span class="bento-icon">&#128176;</span>
+      <h4>Finance</h4>
+      <p>Fraud detection &amp; risk modeling</p>
+    </div>
+    <div class="bento-item">
+      <span class="bento-icon">&#128722;</span>
+      <h4>Retail</h4>
+      <p>Demand forecasting &amp; personalization</p>
+    </div>
+    <div class="bento-item">
+      <span class="bento-icon">&#9881;&#65039;</span>
+      <h4>Manufacturing</h4>
+      <p>Predictive maintenance &amp; quality control</p>
+    </div>
+    <div class="bento-item">
+      <span class="bento-icon">&#127891;</span>
+      <h4>Education</h4>
+      <p>Adaptive learning &amp; admin automation</p>
+    </div>
+    <div class="bento-item bento-medium">
+      <span class="bento-icon">&#127970;</span>
+      <h4>Real Estate</h4>
+      <p>Valuation, lead scoring, document processing</p>
+    </div>
+    <div class="bento-item">
+      <span class="bento-icon">&#9878;&#65039;</span>
+      <h4>Legal</h4>
+      <p>Contract review &amp; research</p>
+    </div>
+    <div class="bento-item">
+      <span class="bento-icon">&#128666;</span>
+      <h4>Logistics</h4>
+      <p>Route optimization &amp; supply chain</p>
+    </div>
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
+<!-- ============================================
+     SECTION 6 — TESTIMONIALS
+     ============================================ -->
 <section id="testimonials">
-  <div class="section-label">Social Proof</div>
-  <h2 class="section-title">Loved by 10,000+ Businesses</h2>
-  <p class="section-sub">Real results from real companies.</p>
-  <div class="testi-grid">
-    <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"IADOPT Recruit cut our hiring time by 80%. We went from 6-week to 8-day hire cycles. The AI screening is scary accurate."</div><div class="testi-author"><div class="testi-avatar">S</div><div><div class="testi-name">Sarah K.</div><div class="testi-role">Head of Talent · GlobalTech</div></div></div></div>
-    <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"We replaced 5 separate tools with IADOPT. ROI in 3 weeks. The automation alone saves us 40 hours a week across the team."</div><div class="testi-author"><div class="testi-avatar">M</div><div><div class="testi-name">Marcus T.</div><div class="testi-role">CTO · FinEdge Capital</div></div></div></div>
-    <div class="testi-card"><div class="testi-stars">★★★★★</div><div class="testi-quote">"Customer satisfaction went from 67% to 94% after deploying IADOPT Chat. Our support team now handles 3x the volume."</div><div class="testi-author"><div class="testi-avatar">P</div><div><div class="testi-name">Priya M.</div><div class="testi-role">CEO · RetailNow</div></div></div></div>
+  <div class="section-label" style="justify-content:center;"><span></span>TESTIMONIALS</div>
+  <h2 class="section-heading">Trusted by <span class="grad-text">Industry Leaders</span></h2>
+
+  <div class="testimonial-container" id="testimonialContainer">
+    <div class="testimonial-card active" data-index="0">
+      <p class="testimonial-text">"IADOPT transformed our hiring pipeline. We reduced time-to-hire by 68% and candidate quality scores jumped 40%. It feels like having a recruiting army that never sleeps."</p>
+      <div class="testimonial-author">Sarah Chen</div>
+      <div class="testimonial-role">VP of People, Meridian Health</div>
+    </div>
+    <div class="testimonial-card right" data-index="1">
+      <p class="testimonial-text">"The predictive analytics suite caught a supply chain disruption 3 weeks before it hit. That early warning saved us $2.4M in a single quarter."</p>
+      <div class="testimonial-author">Marcus Rivera</div>
+      <div class="testimonial-role">COO, NovaTech Industries</div>
+    </div>
+    <div class="testimonial-card left" data-index="2">
+      <p class="testimonial-text">"We went from 12-hour response times to instant resolution for 78% of tickets. Our CSAT scores are the highest they've ever been."</p>
+      <div class="testimonial-author">Priya Kapoor</div>
+      <div class="testimonial-role">CTO, Finley Financial</div>
+    </div>
   </div>
 </section>
 
-<!-- PRICING -->
+<!-- ============================================
+     SECTION 7 — PRICING
+     ============================================ -->
 <section id="pricing">
-  <div class="section-label">Pricing</div>
-  <h2 class="section-title">Simple, Transparent Pricing</h2>
-  <p class="section-sub">Start free. Scale as you grow. No surprise bills.</p>
+  <div style="text-align:center;">
+    <div class="section-label" style="justify-content:center;"><span></span>PRICING</div>
+    <h2 class="section-heading">Simple, <span class="grad-text">Transparent</span> Pricing</h2>
+    <p style="color:var(--muted);max-width:480px;margin:0 auto;line-height:1.7;">
+      Start free. Scale infinitely. No hidden fees, no surprises.
+    </p>
+  </div>
   <div class="pricing-grid">
+    <!-- Starter -->
     <div class="pricing-card">
       <div class="pricing-tier">Starter</div>
-      <div class="pricing-price">$49<span>/mo</span></div>
-      <div class="pricing-desc">Perfect for small teams getting started with AI</div>
+      <div class="pricing-price"><span class="currency">$</span>0</div>
+      <div class="pricing-period">Free forever</div>
       <ul class="pricing-features">
-        <li>Up to 5 users</li><li>3 IADOPT products</li><li>5,000 AI decisions/mo</li><li>Email support</li><li>Basic analytics</li>
+        <li>1 AI product module</li>
+        <li>1,000 tasks / month</li>
+        <li>Community support</li>
+        <li>Basic analytics</li>
       </ul>
-      <button class="btn-pricing outlined">Start Free Trial</button>
+      <button class="pricing-btn pricing-btn-outline">Get Started</button>
     </div>
-    <div class="pricing-card featured">
-      <div class="pricing-badge">Most Popular</div>
-      <div class="pricing-tier">Growth</div>
-      <div class="pricing-price">$199<span>/mo</span></div>
-      <div class="pricing-desc">For growing teams that need the full AI suite</div>
+    <!-- Pro (featured) -->
+    <div class="pricing-card pricing-featured">
+      <div class="pricing-tier">Pro</div>
+      <div class="pricing-price"><span class="currency">$</span>99</div>
+      <div class="pricing-period">per user / month</div>
       <ul class="pricing-features">
-        <li>Unlimited users</li><li>All 6 IADOPT products</li><li>Unlimited AI decisions</li><li>Priority support 24/7</li><li>Advanced analytics</li><li>Custom workflows</li>
+        <li>All 6 AI modules</li>
+        <li>Unlimited tasks</li>
+        <li>Priority support</li>
+        <li>Advanced analytics</li>
+        <li>Custom integrations</li>
       </ul>
-      <button class="btn-pricing filled">Get Started →</button>
+      <button class="pricing-btn pricing-btn-fill">Start Free Trial</button>
     </div>
+    <!-- Enterprise -->
     <div class="pricing-card">
       <div class="pricing-tier">Enterprise</div>
       <div class="pricing-price">Custom</div>
-      <div class="pricing-desc">For large orgs that need dedicated infrastructure</div>
+      <div class="pricing-period">tailored to your scale</div>
       <ul class="pricing-features">
-        <li>Dedicated infrastructure</li><li>Custom AI training</li><li>White-label option</li><li>SLA guarantee</li><li>Dedicated success manager</li>
+        <li>Everything in Pro</li>
+        <li>Dedicated infrastructure</li>
+        <li>24/7 SLA &amp; account team</li>
+        <li>On-premise deployment</li>
+        <li>Custom model training</li>
       </ul>
-      <button class="btn-pricing outlined">Talk to Sales</button>
+      <button class="pricing-btn pricing-btn-outline">Contact Sales</button>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
+<!-- ============================================
+     SECTION 8 — CTA
+     ============================================ -->
 <section id="cta">
-  <h2>Ready to lead the<br><span class="grad">AI revolution?</span></h2>
-  <p>Join 10,000+ businesses already powered by IADOPT.AI. Start free, no credit card required.</p>
-  <div class="cta-btns">
-    <button class="btn-primary">Start Free Trial →</button>
-    <button class="btn-secondary">Talk to Sales</button>
-  </div>
-  <div class="trust-badges">
-    <div class="badge"><span class="badge-icon">🔒</span>SOC2 Certified</div>
-    <div class="badge"><span class="badge-icon">🛡️</span>GDPR Compliant</div>
-    <div class="badge"><span class="badge-icon">✅</span>HIPAA Ready</div>
-    <div class="badge"><span class="badge-icon">💳</span>No credit card required</div>
+  <h2 class="cta-heading font-display">
+    Ready to <span class="grad-text">Adopt Intelligence</span>?
+  </h2>
+  <p class="cta-sub">Join 2,400+ companies already building the future. Start in minutes.</p>
+  <div class="hero-btns">
+    <button class="btn-glow">Deploy Now &rarr;</button>
+    <button class="btn-ghost">Talk to Sales</button>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <div class="nav-logo">IADOPT.AI</div>
-      <p>The intelligence behind everything. AI-powered products for every business, every team, every industry.</p>
-    </div>
-    <div class="footer-col"><h4>Products</h4><a href="#">IADOPT Recruit</a><a href="#">IADOPT Chat</a><a href="#">IADOPT Analytics</a><a href="#">IADOPT Automate</a><a href="#">IADOPT Shield</a><a href="#">IADOPT CRM</a></div>
-    <div class="footer-col"><h4>Solutions</h4><a href="#">Healthcare</a><a href="#">Finance</a><a href="#">Retail</a><a href="#">Manufacturing</a><a href="#">Education</a></div>
-    <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Press</a><a href="#">Investors</a></div>
-    <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Security</a><a href="#">Compliance</a></div>
+  <div class="footer-logo">IADOPT.AI</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Status</a>
+    <a href="#">Docs</a>
+    <a href="#">Blog</a>
   </div>
-  <div class="footer-bottom">
-    <p>© 2026 IADOPT.AI — All rights reserved</p>
-    <p>Built with ❤️ and AI</p>
-  </div>
+  <div class="footer-copy">&copy; 2026 IADOPT.AI — All rights reserved.</div>
 </footer>
 
+
+<!-- ============================================
+     MAIN SCRIPT — single regular <script> tag
+     ============================================ -->
 <script>
-// ── LOADER ───────────────────────────────────────────────
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    var loader = document.getElementById('loader');
-    loader.style.opacity = '0';
-    loader.style.transform = 'translateY(-100%)';
-    setTimeout(function(){ loader.style.display = 'none'; }, 600);
-  }, 1200);
-});
+(function() {
+  'use strict';
 
-// ── SCROLL PROGRESS ──────────────────────────────────────
-window.addEventListener('scroll', function() {
-  var prog = document.getElementById('progress');
-  var pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-  prog.style.width = pct + '%';
-}, { passive: true });
+  // ============================================
+  // UTILS
+  // ============================================
+  var isMobile = window.innerWidth < 768;
+  function lerp(a, b, t) { return a + (b - a) * t; }
 
-// ── CUSTOM CURSOR ────────────────────────────────────────
-var dot = document.getElementById('cursor-dot');
-var ring = document.getElementById('cursor-ring');
-var rx = 0, ry = 0;
-document.addEventListener('mousemove', function(e) {
-  dot.style.left = e.clientX + 'px';
-  dot.style.top = e.clientY + 'px';
-  rx += (e.clientX - rx) * 0.12;
-  ry += (e.clientY - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top = ry + 'px';
-}, { passive: true });
-function animCursor(){ rx += (parseFloat(dot.style.left)||0 - rx)*0.12; ry += (parseFloat(dot.style.top)||0 - ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animCursor); }
-requestAnimationFrame(animCursor);
-document.querySelectorAll('a,button').forEach(function(el){
-  el.addEventListener('mouseenter',function(){ ring.style.width='60px'; ring.style.height='60px'; ring.style.background='rgba(0,229,255,0.1)'; });
-  el.addEventListener('mouseleave',function(){ ring.style.width='40px'; ring.style.height='40px'; ring.style.background='transparent'; });
-});
+  // ============================================
+  // LOADER / OPENING SEQUENCE
+  // ============================================
+  var loader = document.getElementById('loader');
+  var loaderScan = document.getElementById('loaderScan');
+  var letters = document.querySelectorAll('#loaderTitle .letter');
+  var aiSuffix = document.querySelector('#loaderTitle .ai-suffix');
+  var loaderTagline = document.getElementById('loaderTagline');
 
-// ── THREE.JS — ARC REACTOR ──────────────────────────────
-try {
-  var canvas = document.getElementById('webgl');
-  var W = window.innerWidth, H = window.innerHeight;
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(W, H);
-  renderer.setClearColor(0x000000, 0);
+  // Safety: loader ALWAYS hides after 2s max
+  var loaderTimeout = setTimeout(function() {
+    if (loader) {
+      loader.style.opacity = '0';
+      loader.style.pointerEvents = 'none';
+      setTimeout(function() { loader.style.display = 'none'; }, 600);
+      onLoaderDone();
+    }
+  }, 2000);
 
-  var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(75, W/H, 0.1, 200);
-  camera.position.z = 7;
+  // 0.0s — black screen
+  // 0.2s — cyan scan line from top to bottom
+  try {
+    gsap.set(loaderScan, { opacity: 1, y: -10 });
+    gsap.to(loaderScan, {
+      y: window.innerHeight,
+      duration: 0.5,
+      delay: 0.2,
+      ease: 'power2.inOut',
+      onComplete: function() { gsap.to(loaderScan, { opacity: 0, duration: 0.2 }); }
+    });
 
-  // Lights
-  var ambLight = new THREE.AmbientLight(0x001122, 0.5);
-  scene.add(ambLight);
-  var coreLight = new THREE.PointLight(0x00E5FF, 6, 8);
-  scene.add(coreLight);
-  var goldLight = new THREE.PointLight(0xFFB300, 3, 12);
-  goldLight.position.set(3, 2, 2);
-  scene.add(goldLight);
-  var redLight = new THREE.PointLight(0xFF3D00, 2, 10);
-  redLight.position.set(-3, -2, 2);
-  scene.add(redLight);
+    // 0.6s — letters fade in one by one (80ms apart)
+    letters.forEach(function(letter, i) {
+      gsap.to(letter, {
+        opacity: 1,
+        duration: 0.15,
+        delay: 0.6 + i * 0.08,
+        ease: 'power2.out'
+      });
+    });
 
-  // ARC REACTOR CENTER
-  // 1. Outer ring - gold
-  var outerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.9, 0.04, 16, 100),
-    new THREE.MeshBasicMaterial({ color: 0xFFB300, transparent: true, opacity: 0.9 })
-  );
-  scene.add(outerRing);
+    // 0.9s — ".AI" appears
+    gsap.to(aiSuffix, {
+      opacity: 1,
+      duration: 0.3,
+      delay: 0.9,
+      ease: 'power2.out'
+    });
 
-  // 2. Middle ring - cyan
-  var midRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.65, 0.025, 16, 80),
-    new THREE.MeshBasicMaterial({ color: 0x00E5FF, transparent: true, opacity: 0.8 })
-  );
-  scene.add(midRing);
+    // 1.2s — tagline fades in
+    gsap.to(loaderTagline, {
+      opacity: 1,
+      duration: 0.4,
+      delay: 1.2,
+      ease: 'power2.out'
+    });
 
-  // 3. Inner ring - red
-  var innerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.4, 0.02, 16, 60),
-    new THREE.MeshBasicMaterial({ color: 0xFF3D00, transparent: true, opacity: 0.8 })
-  );
-  scene.add(innerRing);
-
-  // 4. Core sphere - bright cyan glow
-  var core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.18, 32, 32),
-    new THREE.MeshStandardMaterial({
-      color: 0x00E5FF, emissive: 0x00E5FF, emissiveIntensity: 2.0,
-      metalness: 0, roughness: 0
-    })
-  );
-  scene.add(core);
-
-  // 5. Triangular spokes
-  for (var i = 0; i < 6; i++) {
-    var spoke = new THREE.Mesh(
-      new THREE.BoxGeometry(0.02, 0.45, 0.01),
-      new THREE.MeshBasicMaterial({ color: 0xFFD740, transparent: true, opacity: 0.6 })
-    );
-    spoke.rotation.z = (i / 6) * Math.PI * 2;
-    spoke.position.x = Math.sin((i / 6) * Math.PI * 2) * 0.22;
-    spoke.position.y = Math.cos((i / 6) * Math.PI * 2) * 0.22;
-    scene.add(spoke);
+    // 1.6s — loader slides up
+    gsap.to(loader, {
+      y: '-100%',
+      duration: 0.6,
+      delay: 1.6,
+      ease: 'power3.inOut',
+      onComplete: function() {
+        clearTimeout(loaderTimeout);
+        loader.style.display = 'none';
+        onLoaderDone();
+      }
+    });
+  } catch(e) {
+    // If GSAP fails, hide loader immediately
+    loader.style.display = 'none';
+    onLoaderDone();
   }
 
-  // 6. Glow sprites
-  var arcGlow1 = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x00E5FF, transparent: true, opacity: 0.15, depthWrite: false }));
-  arcGlow1.scale.set(3, 3, 1);
-  scene.add(arcGlow1);
-  var arcGlow2 = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xFFB300, transparent: true, opacity: 0.08, depthWrite: false }));
-  arcGlow2.scale.set(5, 5, 1);
-  scene.add(arcGlow2);
-
-  // Particles (Iron Man style — gold/cyan)
-  var pN = window.innerWidth < 768 ? 600 : 2500;
-  var pPos = new Float32Array(pN * 3);
-  for (var i = 0; i < pN * 3; i++) pPos[i] = (Math.random() - 0.5) * 40;
-  var pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-  var pts = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xFFB300, size: 0.06, transparent: true, opacity: 0.4 }));
-  scene.add(pts);
-
-  // Mouse
-  var mx = 0, my = 0;
-  document.addEventListener('mousemove', function(e) { mx = (e.clientX / W - 0.5) * 2; my = -(e.clientY / H - 0.5) * 2; }, { passive: true });
-  window.addEventListener('resize', function() { W = window.innerWidth; H = window.innerHeight; camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H); });
-
-  var t = 0;
-  var targetRotX = 0, targetRotY = 0, curRotX = 0, curRotY = 0;
-  function animate() {
-    requestAnimationFrame(animate);
-    t += 0.008;
-
-    // Arc reactor animation
-    outerRing.rotation.z += 0.006;
-    outerRing.rotation.x = Math.sin(t * 0.3) * 0.2;
-    midRing.rotation.z -= 0.01;
-    midRing.rotation.y += 0.005;
-    innerRing.rotation.z += 0.015;
-    innerRing.rotation.x -= 0.008;
-
-    // Core pulse
-    var pulse = 1 + Math.sin(t * 2) * 0.08;
-    core.scale.setScalar(pulse);
-    core.material.emissiveIntensity = 1.8 + Math.sin(t * 2) * 0.5;
-
-    // Glow pulse
-    arcGlow1.material.opacity = 0.12 + Math.sin(t * 1.5) * 0.06;
-    arcGlow2.material.opacity = 0.06 + Math.sin(t * 0.8) * 0.03;
-
-    // Move core light with pulse
-    coreLight.intensity = 5 + Math.sin(t * 2) * 2;
-
-    // Particles drift
-    pts.rotation.y += 0.0002;
-    pts.rotation.x += 0.0001;
-
-    // Smooth mouse parallax
-    targetRotX = my * 0.08;
-    targetRotY = mx * 0.08;
-    curRotX += (targetRotX - curRotX) * 0.04;
-    curRotY += (targetRotY - curRotY) * 0.04;
-    scene.rotation.x = curRotX;
-    scene.rotation.y = curRotY;
-
-    // Scroll camera
-    var scrollPct = window.scrollY / (document.body.scrollHeight - window.innerHeight) || 0;
-    camera.position.z = 7 - scrollPct * 3;
-    camera.position.y = scrollPct * 1.5;
-
-    renderer.render(scene, camera);
+  var loaderDone = false;
+  function onLoaderDone() {
+    if (loaderDone) return;
+    loaderDone = true;
+    animateHeroIn();
+    animateNavIn();
   }
-  animate();
-} catch(e) {
-  console.warn('WebGL unavailable:', e);
-  document.getElementById('webgl').style.background = 'radial-gradient(ellipse at 50% 30%, rgba(255,179,0,0.1) 0%, transparent 70%)';
-}
 
-// ── GSAP SCROLL ANIMATIONS ────────────────────────────────
-gsap.registerPlugin(ScrollTrigger);
+  // ============================================
+  // NAV ENTRANCE
+  // ============================================
+  function animateNavIn() {
+    try {
+      gsap.to('#mainNav', { y: 0, duration: 0.8, delay: 0.2, ease: 'power3.out' });
+    } catch(e) {
+      document.getElementById('mainNav').style.transform = 'translateY(0)';
+    }
+  }
 
-// Products cards
-gsap.utils.toArray('.product-card').forEach(function(card, i) {
-  gsap.to(card, { opacity:1, y:0, duration:0.7, ease:'power3.out', delay: i*0.1,
-    scrollTrigger:{ trigger:card, start:'top 85%' }
-  });
-});
+  // ============================================
+  // HERO ENTRANCE
+  // ============================================
+  function animateHeroIn() {
+    try {
+      var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      tl.to('.hero-badge', { opacity: 1, y: 0, duration: 0.6 }, 0)
+        .to('.hero-title .line1', { opacity: 1, y: 0, duration: 0.7 }, 0.15)
+        .to('.hero-title .line2', { opacity: 1, y: 0, duration: 0.7 }, 0.3)
+        .to('.hero-sub', { opacity: 1, y: 0, duration: 0.6 }, 0.45)
+        .to('.hero-btns', { opacity: 1, y: 0, duration: 0.6 }, 0.55)
+        .to('.hero-scroll', { opacity: 0.6, duration: 0.5 }, 0.7);
+    } catch(e) {
+      // Fallback: show everything
+      document.querySelectorAll('.hero-badge,.hero-title .line1,.hero-title .line2,.hero-sub,.hero-btns,.hero-scroll').forEach(function(el) {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }
+  }
 
-// Stats
-gsap.utils.toArray('.stat-item').forEach(function(item, i) {
-  gsap.to(item, { opacity:1, y:0, duration:0.7, delay:i*0.15,
-    scrollTrigger:{ trigger:item, start:'top 85%' }
-  });
-  var numEl = item.querySelector('.stat-num');
-  var target = parseFloat(numEl.dataset.target);
-  var suffix = numEl.dataset.suffix || '+';
-  ScrollTrigger.create({ trigger:item, start:'top 85%', once:true, onEnter:function(){
-    var obj = {val:0};
-    gsap.to(obj, { val:target, duration:2, ease:'power2.out', onUpdate:function(){
-      var v = obj.val;
-      if(target >= 1000000000) numEl.textContent = (v/1000000000).toFixed(1) + 'B+';
-      else if(target >= 1000) numEl.textContent = Math.round(v/1000).toLocaleString() + ',000+';
-      else numEl.textContent = v.toFixed(target%1!==0?1:0) + suffix;
-    }});
-  }});
-});
+  // ============================================
+  // CUSTOM CURSOR
+  // ============================================
+  if (!isMobile) {
+    var cursorDot = document.getElementById('cursorDot');
+    var cursorRing = document.getElementById('cursorRing');
+    var dot = { x: 0, y: 0 };
+    var ring = { x: 0, y: 0 };
 
-// Steps
-gsap.utils.toArray('.step').forEach(function(el, i) {
-  gsap.to(el, { opacity:1, y:0, duration:0.8, delay:i*0.2,
-    scrollTrigger:{ trigger:el, start:'top 85%' }
-  });
-});
+    document.addEventListener('mousemove', function(e) {
+      dot.x = e.clientX;
+      dot.y = e.clientY;
+    });
 
-// Industry tiles
-gsap.utils.toArray('.industry-tile').forEach(function(el, i) {
-  gsap.to(el, { opacity:1, scale:1, duration:0.6, delay:i*0.07,
-    scrollTrigger:{ trigger:el, start:'top 90%' }
-  });
-});
+    function animCursor() {
+      ring.x += (dot.x - ring.x) * 0.15;
+      ring.y += (dot.y - ring.y) * 0.15;
+      cursorDot.style.left = dot.x + 'px';
+      cursorDot.style.top = dot.y + 'px';
+      cursorRing.style.left = ring.x + 'px';
+      cursorRing.style.top = ring.y + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
 
-// Testimonials
-gsap.utils.toArray('.testi-card').forEach(function(el, i) {
-  gsap.to(el, { opacity:1, y:0, duration:0.8, delay:i*0.15,
-    scrollTrigger:{ trigger:el, start:'top 85%' }
-  });
-});
+    // Hover effect on interactive elements
+    document.querySelectorAll('a, button, .product-card, .bento-item, .pricing-card').forEach(function(el) {
+      el.addEventListener('mouseenter', function() {
+        document.body.classList.add('cursor-hover');
+      });
+      el.addEventListener('mouseleave', function() {
+        document.body.classList.remove('cursor-hover');
+      });
+    });
+  }
 
-// Pricing
-gsap.utils.toArray('.pricing-card').forEach(function(el, i) {
-  gsap.to(el, { opacity:1, y:0, duration:0.8, delay:i*0.15,
-    scrollTrigger:{ trigger:el, start:'top 85%' }
-  });
-});
+  // ============================================
+  // SCROLL PROGRESS BAR
+  // ============================================
+  var progressBar = document.getElementById('scroll-progress');
+  window.addEventListener('scroll', function() {
+    var scrollTop = window.scrollY;
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var progress = (scrollTop / docHeight) * 100;
+    progressBar.style.width = progress + '%';
+  }, { passive: true });
 
-// CTA
-gsap.to('#cta h2', { opacity:1, y:0, duration:1, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
-gsap.to('#cta p', { opacity:1, y:0, duration:1, delay:0.2, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
-gsap.to('.cta-btns', { opacity:1, y:0, duration:1, delay:0.4, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
-gsap.to('.trust-badges', { opacity:1, duration:1, delay:0.6, scrollTrigger:{ trigger:'#cta', start:'top 80%' }});
+  // ============================================
+  // THREE.JS SCENE
+  // ============================================
+  var threeOK = false;
+  var scene, camera, renderer;
+  var neuralGroup, particleIndigoMesh, particleCyanMesh, floatingShapes;
+  var mouseX = 0, mouseY = 0;
+  var clock;
+
+  try {
+    if (typeof THREE === 'undefined') throw new Error('THREE not loaded');
+    if (isMobile) throw new Error('Mobile — skip Three.js');
+
+    var canvas = document.getElementById('webgl');
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x02020F, 0.02);
+
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 9);
+
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.4;
+    renderer.setClearColor(0x02020F, 1);
+
+    clock = new THREE.Clock();
+
+    // --- LIGHTING ---
+    var ambientLight = new THREE.AmbientLight(0x6366F1, 0.3);
+    scene.add(ambientLight);
+    var pointLight1 = new THREE.PointLight(0x6366F1, 1.5, 30);
+    pointLight1.position.set(5, 5, 5);
+    scene.add(pointLight1);
+    var pointLight2 = new THREE.PointLight(0x22D3EE, 1.0, 25);
+    pointLight2.position.set(-5, -3, 3);
+    scene.add(pointLight2);
+    var pointLight3 = new THREE.PointLight(0xEC4899, 0.6, 20);
+    pointLight3.position.set(0, 5, -5);
+    scene.add(pointLight3);
+
+    // --- OBJECT 1: NEURAL NETWORK ---
+    neuralGroup = new THREE.Group();
+    var nodeCount = 80;
+    var nodePositions = [];
+    var nodeMat = new THREE.MeshStandardMaterial({
+      color: 0x6366F1,
+      emissive: 0x6366F1,
+      emissiveIntensity: 1.5,
+      metalness: 0.5,
+      roughness: 0.4
+    });
+    var nodeGeo = new THREE.SphereGeometry(0.06, 8, 8);
+
+    for (var i = 0; i < nodeCount; i++) {
+      var mesh = new THREE.Mesh(nodeGeo, nodeMat);
+      var px = (Math.random() - 0.5) * 4;
+      var py = (Math.random() - 0.5) * 4;
+      var pz = (Math.random() - 0.5) * 4;
+      mesh.position.set(px, py, pz);
+      mesh.userData = {
+        basePos: { x: px, y: py, z: pz },
+        phase: Math.random() * Math.PI * 2,
+        amplitude: 0.05 + Math.random() * 0.15,
+        speed: 0.5 + Math.random() * 1.5
+      };
+      neuralGroup.add(mesh);
+      nodePositions.push(mesh.position);
+    }
+
+    // Connections — find pairs within distance 1.8
+    var connectionVerts = [];
+    for (var a = 0; a < nodeCount; a++) {
+      for (var b = a + 1; b < nodeCount; b++) {
+        var dist = nodePositions[a].distanceTo(nodePositions[b]);
+        if (dist < 1.8 && connectionVerts.length / 6 < 120) {
+          connectionVerts.push(
+            nodePositions[a].x, nodePositions[a].y, nodePositions[a].z,
+            nodePositions[b].x, nodePositions[b].y, nodePositions[b].z
+          );
+        }
+      }
+    }
+    var lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(connectionVerts, 3));
+    var lineMat = new THREE.LineBasicMaterial({ color: 0x22D3EE, transparent: true, opacity: 0.15 });
+    var lines = new THREE.LineSegments(lineGeo, lineMat);
+    neuralGroup.add(lines);
+    // Store reference for animation
+    neuralGroup.userData.lines = lines;
+    neuralGroup.userData.nodePositions = nodePositions;
+
+    scene.add(neuralGroup);
+
+    // --- OBJECT 2: PARTICLE GALAXY (InstancedMesh) ---
+    var particleCountBase = 4000;
+    var particleCount = isMobile ? Math.floor(particleCountBase * 0.25) : particleCountBase;
+    var indigoCount = Math.floor(particleCount * 0.6);
+    var cyanCount = particleCount - indigoCount;
+
+    var particleGeo = new THREE.SphereGeometry(0.015, 4, 4);
+    var indigoMat = new THREE.MeshBasicMaterial({ color: 0x6366F1 });
+    var cyanMat = new THREE.MeshBasicMaterial({ color: 0x22D3EE });
+
+    particleIndigoMesh = new THREE.InstancedMesh(particleGeo, indigoMat, indigoCount);
+    particleCyanMesh = new THREE.InstancedMesh(particleGeo, cyanMat, cyanCount);
+
+    var dummy = new THREE.Object3D();
+    function randomSpherePoint(radius) {
+      var u = Math.random();
+      var v = Math.random();
+      var theta = 2 * Math.PI * u;
+      var phi = Math.acos(2 * v - 1);
+      var r = radius * Math.cbrt(Math.random());
+      return {
+        x: r * Math.sin(phi) * Math.cos(theta),
+        y: r * Math.sin(phi) * Math.sin(theta),
+        z: r * Math.cos(phi)
+      };
+    }
+
+    var particleData = [];
+    for (var i = 0; i < indigoCount; i++) {
+      var p = randomSpherePoint(15);
+      dummy.position.set(p.x, p.y, p.z);
+      dummy.updateMatrix();
+      particleIndigoMesh.setMatrixAt(i, dummy.matrix);
+      particleData.push({ x: p.x, y: p.y, z: p.z, speed: 0.1 + Math.random() * 0.3, type: 'indigo', index: i });
+    }
+    for (var i = 0; i < cyanCount; i++) {
+      var p = randomSpherePoint(15);
+      dummy.position.set(p.x, p.y, p.z);
+      dummy.updateMatrix();
+      particleCyanMesh.setMatrixAt(i, dummy.matrix);
+      particleData.push({ x: p.x, y: p.y, z: p.z, speed: 0.1 + Math.random() * 0.3, type: 'cyan', index: i });
+    }
+
+    scene.add(particleIndigoMesh);
+    scene.add(particleCyanMesh);
+
+    // --- OBJECT 3: FLOATING GEOMETRIC SHAPES ---
+    floatingShapes = [];
+    var shapeConfigs = [
+      { geo: new THREE.IcosahedronGeometry(0.3, 0), mat: new THREE.MeshBasicMaterial({ color: 0x6366F1, wireframe: true }), pos: [-4, 2, -3] },
+      { geo: new THREE.OctahedronGeometry(0.35), mat: new THREE.MeshStandardMaterial({ color: 0x8B5CF6, metalness: 0.9, roughness: 0.2 }), pos: [5, -1, -2] },
+      { geo: new THREE.TorusGeometry(0.3, 0.08, 8, 20), mat: new THREE.MeshBasicMaterial({ color: 0x22D3EE, wireframe: true }), pos: [-3, -2.5, -4] },
+      { geo: new THREE.TetrahedronGeometry(0.35), mat: new THREE.MeshStandardMaterial({ color: 0xEC4899, metalness: 0.8, roughness: 0.3 }), pos: [4, 3, -5] },
+      { geo: new THREE.DodecahedronGeometry(0.28), mat: new THREE.MeshBasicMaterial({ color: 0x6366F1, wireframe: true }), pos: [2, -3, -2] },
+      { geo: new THREE.TorusKnotGeometry(0.2, 0.06, 50, 6), mat: new THREE.MeshStandardMaterial({ color: 0x8B5CF6, metalness: 0.7, roughness: 0.3 }), pos: [-5, 1, -6] }
+    ];
+
+    shapeConfigs.forEach(function(cfg, i) {
+      var mesh = new THREE.Mesh(cfg.geo, cfg.mat);
+      mesh.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
+      mesh.userData.rotSpeed = { x: 0.002 + Math.random() * 0.008, y: 0.003 + Math.random() * 0.008, z: 0.001 + Math.random() * 0.006 };
+      scene.add(mesh);
+      floatingShapes.push(mesh);
+
+      // GSAP floating yoyo
+      try {
+        gsap.to(mesh.position, {
+          y: '+=' + 0.4,
+          yoyo: true,
+          repeat: -1,
+          duration: 2 + i * 0.5,
+          ease: 'sine.inOut'
+        });
+      } catch(e) {}
+    });
+
+    // --- SCROLL-DRIVEN CAMERA PATH ---
+    var waypoints = [
+      { pos: [0, 0, 9], target: [0, 0, 0] },
+      { pos: [4, 1, 6], target: [0, 0, 0] },
+      { pos: [-3, 2, 7], target: [0, 0, 0] },
+      { pos: [0, 4, 8], target: [0, 1, 0] },
+      { pos: [0, 0, 10], target: [0, 0, 0] }
+    ];
+    var currentTarget = { x: 0, y: 0, z: 0 };
+
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+
+      ScrollTrigger.create({
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom bottom',
+        onUpdate: function(self) {
+          var p = self.progress * (waypoints.length - 1);
+          var idx = Math.floor(p);
+          var t = p - idx;
+          var from = waypoints[Math.min(idx, waypoints.length - 1)];
+          var to = waypoints[Math.min(idx + 1, waypoints.length - 1)];
+
+          var targetX = lerp(from.pos[0], to.pos[0], t);
+          var targetY = lerp(from.pos[1], to.pos[1], t);
+          var targetZ = lerp(from.pos[2], to.pos[2], t);
+
+          camera.position.x += (targetX - camera.position.x) * 0.1;
+          camera.position.y += (targetY - camera.position.y) * 0.1;
+          camera.position.z += (targetZ - camera.position.z) * 0.1;
+
+          var lookX = lerp(from.target[0], to.target[0], t);
+          var lookY = lerp(from.target[1], to.target[1], t);
+          var lookZ = lerp(from.target[2], to.target[2], t);
+
+          currentTarget.x += (lookX - currentTarget.x) * 0.1;
+          currentTarget.y += (lookY - currentTarget.y) * 0.1;
+          currentTarget.z += (lookZ - currentTarget.z) * 0.1;
+
+          camera.lookAt(currentTarget.x, currentTarget.y, currentTarget.z);
+
+          // Particles contract toward center on scroll
+          var scale = lerp(1, 0.6, self.progress);
+          particleIndigoMesh.scale.setScalar(scale);
+          particleCyanMesh.scale.setScalar(scale);
+        }
+      });
+    } catch(e) {}
+
+    // --- MOUSE PARALLAX ---
+    document.addEventListener('mousemove', function(e) {
+      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+    });
+
+    // --- SINGLE RENDER LOOP ---
+    function animate() {
+      requestAnimationFrame(animate);
+      var elapsed = clock.getElapsedTime();
+
+      // Neural network breathe + rotate
+      if (neuralGroup) {
+        neuralGroup.rotation.y += 0.002;
+
+        // Mouse parallax tilt
+        neuralGroup.rotation.x += (mouseY * 0.3 - neuralGroup.rotation.x) * 0.05;
+        neuralGroup.rotation.z += (mouseX * -0.2 - neuralGroup.rotation.z) * 0.05;
+
+        // Nodes oscillate
+        var nodeChildren = neuralGroup.children;
+        for (var i = 0; i < nodeChildren.length; i++) {
+          var child = nodeChildren[i];
+          if (child.userData && child.userData.basePos) {
+            var ud = child.userData;
+            child.position.x = ud.basePos.x + Math.sin(elapsed * ud.speed + ud.phase) * ud.amplitude;
+            child.position.y = ud.basePos.y + Math.cos(elapsed * ud.speed * 0.8 + ud.phase) * ud.amplitude;
+            child.position.z = ud.basePos.z + Math.sin(elapsed * ud.speed * 0.6 + ud.phase * 1.3) * ud.amplitude * 0.5;
+          }
+        }
+
+        // Update line positions to follow nodes
+        var lineObj = neuralGroup.userData.lines;
+        if (lineObj) {
+          var positions = lineObj.geometry.attributes.position.array;
+          // Lines connect nodes; their positions are already updated via reference
+          lineObj.geometry.attributes.position.needsUpdate = true;
+        }
+      }
+
+      // Particle galaxy rotation
+      if (particleIndigoMesh) {
+        particleIndigoMesh.rotation.y += 0.0005;
+      }
+      if (particleCyanMesh) {
+        particleCyanMesh.rotation.y -= 0.0003;
+      }
+
+      // Floating shapes rotation
+      if (floatingShapes) {
+        for (var i = 0; i < floatingShapes.length; i++) {
+          var s = floatingShapes[i];
+          s.rotation.x += s.userData.rotSpeed.x;
+          s.rotation.y += s.userData.rotSpeed.y;
+          s.rotation.z += s.userData.rotSpeed.z;
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handler
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    threeOK = true;
+
+  } catch(e) {
+    // Three.js failed — show CSS fallback
+    console.warn('Three.js disabled:', e.message);
+    document.getElementById('cssFallback').classList.add('active');
+    var c = document.getElementById('webgl');
+    if (c) c.style.display = 'none';
+  }
+
+  // ============================================
+  // GSAP SCROLL ANIMATIONS
+  // ============================================
+  try {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // --- PRODUCT CARDS ---
+    gsap.utils.toArray('.product-card').forEach(function(card, i) {
+      gsap.from(card, {
+        opacity: 0,
+        y: 60,
+        rotateX: 20,
+        duration: 0.8,
+        delay: i * 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+    // --- STAT COUNTER ANIMATION ---
+    gsap.utils.toArray('.stat-number').forEach(function(el) {
+      var target = parseFloat(el.getAttribute('data-target'));
+      var suffix = el.getAttribute('data-suffix') || '';
+      var isDecimal = el.getAttribute('data-decimal') === 'true';
+
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 85%',
+        once: true,
+        onEnter: function() {
+          gsap.to({ val: 0 }, {
+            val: target,
+            duration: 2,
+            ease: 'power2.out',
+            onUpdate: function() {
+              var v = this.targets()[0].val;
+              el.textContent = (isDecimal ? v.toFixed(1) : Math.floor(v)) + suffix;
+            }
+          });
+        }
+      });
+    });
+
+    // --- HOW IT WORKS — HORIZONTAL SCROLL ---
+    var panels = gsap.utils.toArray('.how-panel');
+    if (panels.length > 1) {
+      gsap.to(panels, {
+        xPercent: -100 * (panels.length - 1),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#how',
+          pin: true,
+          scrub: 1,
+          snap: 1 / (panels.length - 1),
+          end: function() { return '+=' + document.querySelector('#how').offsetWidth * 2; }
+        }
+      });
+    }
+
+    // --- BENTO ITEMS ---
+    gsap.utils.toArray('.bento-item').forEach(function(item, i) {
+      gsap.from(item, {
+        opacity: 0,
+        y: 40,
+        scale: 0.95,
+        duration: 0.7,
+        delay: i * 0.08,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 88%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+    // --- PRICING CARDS ---
+    gsap.utils.toArray('.pricing-card').forEach(function(card, i) {
+      gsap.from(card, {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        delay: i * 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+    // --- CTA ENTRANCE ---
+    gsap.from('.cta-heading', {
+      opacity: 0,
+      y: 60,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '#cta', start: 'top 70%' }
+    });
+    gsap.from('.cta-sub', {
+      opacity: 0,
+      y: 40,
+      duration: 0.8,
+      delay: 0.2,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '#cta', start: 'top 70%' }
+    });
+    gsap.from('#cta .hero-btns', {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      delay: 0.4,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '#cta', start: 'top 70%' }
+    });
+
+    // --- SECTION LABELS AND HEADINGS ---
+    gsap.utils.toArray('.section-label, .section-heading').forEach(function(el) {
+      gsap.from(el, {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 88%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+  } catch(e) {
+    console.warn('GSAP scroll animations failed:', e.message);
+    // Fallback: make everything visible
+    document.querySelectorAll('.product-card, .bento-item, .pricing-card, .stat-number').forEach(function(el) {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+  }
+
+  // ============================================
+  // TESTIMONIAL ROTATION
+  // ============================================
+  var testimonialCards = document.querySelectorAll('.testimonial-card');
+  var currentTestimonial = 0;
+  var positions = ['active', 'right', 'left'];
+
+  function rotateTestimonials() {
+    currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
+    testimonialCards.forEach(function(card, i) {
+      card.className = 'testimonial-card';
+      var posIndex = (i - currentTestimonial + testimonialCards.length) % testimonialCards.length;
+      card.classList.add(positions[posIndex]);
+    });
+  }
+
+  setInterval(rotateTestimonials, 4000);
+
+})();
 </script>
 </body>
 </html>
