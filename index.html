@@ -251,7 +251,7 @@ body {
   display: none;
   background: none;
   border: none;
-  cursor: none;
+  cursor: pointer;
   padding: 4px;
 }
 
@@ -264,6 +264,47 @@ body {
   border-radius: 2px;
   transition: all 0.3s;
 }
+
+/* Mobile nav dropdown */
+.nav-mobile-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  right: 0;
+  background: rgba(2,2,15,0.95);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px 0;
+  list-style: none;
+  flex-direction: column;
+  gap: 0;
+}
+
+.nav-mobile-menu.open { display: flex; }
+
+.nav-mobile-menu a {
+  display: block;
+  padding: 14px 24px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.3s, background 0.3s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-mobile-menu a:hover,
+.nav-mobile-menu a:active { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* Hamburger animation when open */
+.nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
 /* ============================================
    HERO SECTION
@@ -322,7 +363,7 @@ body {
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-size: clamp(2rem, 8vw, 6rem);
   font-weight: 800;
   line-height: 1.0;
   letter-spacing: -0.04em;
@@ -465,7 +506,7 @@ section { position: relative; }
 
 .section-title {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-size: clamp(1.5rem, 5vw, 3rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
@@ -473,7 +514,7 @@ section { position: relative; }
 }
 
 .section-subtitle {
-  font-size: 1.05rem;
+  font-size: clamp(0.875rem, 2vw, 1.05rem);
   color: var(--text-dim);
   max-width: 560px;
   line-height: 1.6;
@@ -1369,9 +1410,12 @@ section { position: relative; }
 }
 
 @media (max-width: 768px) {
-  .cursor-dot, .cursor-ring { display: none; }
+  /* Cursor & scroll progress: hide on mobile */
+  .cursor-dot, .cursor-ring { display: none !important; }
   body { cursor: auto; }
+  .scroll-progress { display: none; }
 
+  /* Navigation */
   .nav {
     padding: 12px 20px;
     gap: 0;
@@ -1379,30 +1423,107 @@ section { position: relative; }
     width: calc(100% - 32px);
     border-radius: 16px;
   }
-
   .nav-links { display: none; }
-  .nav-toggle { display: block; }
+  .nav-cta { display: none; }
+  .nav-toggle { display: block; cursor: pointer; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
 
-  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  .diff-grid { grid-template-columns: 1fr; }
-  .products-grid { grid-template-columns: 1fr; }
-  .how-steps { grid-template-columns: 1fr; gap: 40px; }
+  /* Hero */
+  .hero { min-height: 100svh; min-height: -webkit-fill-available; }
+  .hero-content { padding: 0 20px; }
+  .hero-ctas { flex-direction: column; align-items: center; gap: 12px; }
+  .hero-ctas .btn-primary,
+  .hero-ctas .btn-ghost { width: 100%; max-width: 300px; text-align: center; }
+  .hero-sub { margin-bottom: 32px; }
+  .scroll-indicator { display: none; }
+
+  /* Section padding */
+  .section-pad { padding: 80px 20px; }
+  .testimonials-section { padding: 80px 0; }
+
+  /* Products grid: 1 col */
+  .products-grid { grid-template-columns: 1fr; gap: 16px; margin-top: 40px; }
+  .product-card { padding: 28px 24px; transform: none !important; }
+  .product-card:hover { transform: translateY(-4px) !important; }
+
+  /* Stats row: 2x2 */
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 48px; }
+
+  /* Differentiator grid */
+  .diff-grid { grid-template-columns: 1fr; gap: 16px; }
+
+  /* How it works: vertical */
+  .how-steps { grid-template-columns: 1fr; gap: 40px; margin-top: 48px; }
   .how-steps::before, .how-line-progress { display: none; }
-  .industries-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
-  .pricing-card.popular { transform: translateY(60px) scale(1); }
-  .pricing-card.popular:hover { transform: translateY(-8px) scale(1); }
-  .testimonials-track { flex-direction: column; align-items: center; }
-  .testimonial-card { max-width: 100%; min-width: 0; }
+
+  /* Industries: 2 col */
+  .industries-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 40px; }
+  .industry-tile { padding: 24px 16px; }
+
+  /* Testimonials: single card carousel */
+  .testimonials-track {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 16px;
+    padding: 0 20px;
+    margin-top: 40px;
+    scrollbar-width: none;
+    perspective: none;
+  }
+  .testimonials-track::-webkit-scrollbar { display: none; }
+  .testimonial-card {
+    min-width: calc(100vw - 56px);
+    max-width: calc(100vw - 56px);
+    flex-shrink: 0;
+    scroll-snap-align: center;
+    padding: 32px 24px;
+  }
+  .testimonial-card.active-center { transform: none; box-shadow: none; border-color: rgba(139,92,246,0.3); }
+  .testimonial-card:hover { transform: none; }
+
+  /* Pricing: stacked, no Z-depth */
+  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; gap: 20px; }
+  .pricing-card { transform: none !important; }
+  .pricing-card.popular { transform: none !important; }
+  .pricing-card:hover, .pricing-card.popular:hover { transform: translateY(-4px) !important; }
+
+  /* Final CTA */
+  .final-cta-section { min-height: 60vh; }
+  .final-cta-buttons { flex-direction: column; align-items: center; gap: 12px; }
+  .final-cta-buttons .btn-primary,
+  .final-cta-buttons .btn-ghost { width: 100%; max-width: 300px; text-align: center; }
+  .trust-badges { flex-direction: column; align-items: center; gap: 12px; }
+
+  /* Footer */
   .footer-top { grid-template-columns: repeat(2, 1fr); gap: 32px; }
-  .footer-bottom { justify-content: center; text-align: center; }
+  .footer-brand { grid-column: 1 / -1; max-width: 100%; }
+  .footer-bottom { justify-content: center; text-align: center; flex-direction: column; }
+  .footer-inner { padding: 48px 20px 32px; }
+
+  /* Tap targets: ensure min 44x44 */
+  a, button { min-height: 44px; }
+  .product-card-link { min-height: 44px; display: inline-flex; align-items: center; }
+  .footer-col a { min-height: 44px; display: flex; align-items: center; }
+  .footer-social-link { width: 44px; height: 44px; }
+  .pricing-btn { min-height: 48px; }
+  .btn-primary, .btn-ghost { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
 }
 
 @media (max-width: 480px) {
-  .section-pad { padding: 100px 16px; }
+  .section-pad { padding: 60px 16px; }
+  .testimonials-section { padding: 60px 0; }
   .industries-grid { grid-template-columns: 1fr; }
-  .stats-row { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .footer-top { grid-template-columns: 1fr; }
+  .hero-content { padding: 0 16px; }
+  .testimonial-card { min-width: calc(100vw - 40px); max-width: calc(100vw - 40px); padding: 28px 20px; }
+  .testimonials-track { padding: 0 16px; }
+  .product-card { padding: 24px 20px; }
+  .pricing-card { padding: 32px 24px; }
+  .pricing-grid { max-width: 100%; }
 }
 
 /* ============================================
@@ -1461,6 +1582,14 @@ section { position: relative; }
   <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
     <span></span><span></span><span></span>
   </button>
+  <ul class="nav-mobile-menu" id="navMobileMenu">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#solutions">Solutions</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#industries">Industries</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" style="color:var(--primary-2);font-weight:600;">Get Started Free</a></li>
+  </ul>
 </nav>
 
 <!-- ============================================
@@ -1958,6 +2087,55 @@ if (!isMobile) {
 }
 
 /* ============================================
+   MOBILE NAV TOGGLE
+   ============================================ */
+const navToggle = document.getElementById('navToggle');
+const navMobileMenu = document.getElementById('navMobileMenu');
+
+navToggle.addEventListener('click', () => {
+  navToggle.classList.toggle('open');
+  navMobileMenu.classList.toggle('open');
+});
+
+// Close mobile menu on link click
+navMobileMenu.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    navToggle.classList.remove('open');
+    navMobileMenu.classList.remove('open');
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+/* ============================================
+   TESTIMONIALS TOUCH SWIPE
+   ============================================ */
+if (isMobile) {
+  const track = document.querySelector('.testimonials-track');
+  if (track) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const cardWidth = () => track.querySelector('.testimonial-card')?.offsetWidth + 16 || 300;
+
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        const scrollAmount = diff > 0 ? cardWidth() : -cardWidth();
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }, { passive: true });
+  }
+}
+
+/* ============================================
    SCROLL PROGRESS BAR
    ============================================ */
 const scrollProgress = document.getElementById('scrollProgress');
@@ -2080,7 +2258,7 @@ function initHeroScene() {
   heroScene.add(helixGroup);
 
   // Particles — use InstancedMesh for performance
-  const particleCount = isMobile ? 800 : 3000;
+  const particleCount = isMobile ? 500 : 3000;
   const pGeo = new THREE.SphereGeometry(0.02, 4, 4);
   const pMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   heroParticles = new THREE.InstancedMesh(pGeo, pMat, particleCount);
@@ -2470,12 +2648,34 @@ document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
 window.addEventListener('DOMContentLoaded', () => {
   runLoader();
 
-  // Init 3D scenes — lazy for CTA
+  // Init 3D scenes
+  // On mobile, try Three.js but fall back to CSS gradient if FPS < 30
   if (!isMobile) {
     initHeroScene();
   } else {
-    // Fallback: add gradient animated background for mobile hero
-    heroCanvas.style.background = 'radial-gradient(ellipse at center, rgba(99,102,241,0.15) 0%, transparent 60%)';
+    // Try lightweight Three.js on mobile, monitor FPS
+    try {
+      initHeroScene();
+      let frameCount = 0;
+      let fpsStart = performance.now();
+      const fpsCheck = () => {
+        frameCount++;
+        if (performance.now() - fpsStart >= 2000) {
+          const fps = frameCount / 2;
+          if (fps < 30) {
+            // Kill Three.js, use CSS gradient
+            if (heroRenderer) { heroRenderer.dispose(); }
+            heroCanvas.style.background = 'radial-gradient(ellipse at 30% 40%, rgba(99,102,241,0.18) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(139,92,246,0.12) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.08) 0%, transparent 50%)';
+            heroCanvas.getContext('webgl')?.getExtension('WEBGL_lose_context')?.loseContext();
+          }
+          return;
+        }
+        requestAnimationFrame(fpsCheck);
+      };
+      requestAnimationFrame(fpsCheck);
+    } catch(e) {
+      heroCanvas.style.background = 'radial-gradient(ellipse at center, rgba(99,102,241,0.15) 0%, transparent 60%)';
+    }
   }
 
   // Lazy init CTA scene
@@ -2484,6 +2684,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (entry.isIntersecting) {
         if (!isMobile) {
           initCtaScene();
+        } else {
+          // CSS gradient fallback for CTA on mobile
+          ctaCanvas.style.background = 'radial-gradient(ellipse at center, rgba(139,92,246,0.12) 0%, transparent 60%)';
         }
         ctaObserver.disconnect();
       }
