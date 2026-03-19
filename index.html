@@ -404,27 +404,36 @@ try {
 
   // Lights
   scene.add(new THREE.AmbientLight(0x1a1a3e, 1));
-  var pl1 = new THREE.PointLight(0x6366F1, 4, 20); scene.add(pl1);
-  var pl2 = new THREE.PointLight(0xEC4899, 3, 15); pl2.position.set(4,3,2); scene.add(pl2);
-  var pl3 = new THREE.PointLight(0x22D3EE, 3, 15); pl3.position.set(-4,-3,2); scene.add(pl3);
+  var pl1 = new THREE.PointLight(0x6366F1, 8, 10); scene.add(pl1);
+  var pl2 = new THREE.PointLight(0xEC4899, 5, 8); pl2.position.set(4,3,2); scene.add(pl2);
+  var pl3 = new THREE.PointLight(0x22D3EE, 5, 8); pl3.position.set(-4,-3,2); scene.add(pl3);
 
   // Central orb
   var orb = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(0.7, 5),
-    new THREE.MeshStandardMaterial({ color:0x6366F1, emissive:0x6366F1, emissiveIntensity:0.3, metalness:0.9, roughness:0.1 })
+    new THREE.IcosahedronGeometry(0.45, 5),
+    new THREE.MeshStandardMaterial({ color:0x6366F1, emissive:0x6366F1, emissiveIntensity:1.2, metalness:0.9, roughness:0.1 })
   );
   scene.add(orb);
   var wire = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(0.8, 2),
+    new THREE.IcosahedronGeometry(0.52, 2),
     new THREE.MeshBasicMaterial({ color:0x8B5CF6, wireframe:true, transparent:true, opacity:0.25 })
   );
   scene.add(wire);
+  // Glow sprite behind orb
+  var spriteMat = new THREE.SpriteMaterial({ color: 0x6366F1, transparent: true, opacity: 0.18, depthWrite: false });
+  var sprite = new THREE.Sprite(spriteMat);
+  sprite.scale.set(3.5, 3.5, 1);
+  scene.add(sprite);
+  var spriteMat2 = new THREE.SpriteMaterial({ color: 0xEC4899, transparent: true, opacity: 0.10, depthWrite: false });
+  var sprite2 = new THREE.Sprite(spriteMat2);
+  sprite2.scale.set(2.2, 2.2, 1);
+  scene.add(sprite2);
 
   // Rings
   var rings = [];
   [[0,0,0],[Math.PI/2,0,0],[Math.PI/4,Math.PI/4,0]].forEach(function(rot,i){
     var r = new THREE.Mesh(
-      new THREE.TorusGeometry(1.5+i*0.4, 0.018, 8, 100),
+      new THREE.TorusGeometry(1.0+i*0.3, 0.018, 8, 100),
       new THREE.MeshBasicMaterial({ color:[0x6366F1,0xEC4899,0x22D3EE][i], transparent:true, opacity:0.7 })
     );
     r.rotation.set(rot[0],rot[1],rot[2]);
@@ -462,7 +471,7 @@ try {
 
     // Orb breathe
     var s = 1 + Math.sin(t*0.9)*0.04;
-    orb.scale.setScalar(s); wire.scale.setScalar(s);
+    orb.scale.setScalar(s); wire.scale.setScalar(s); if(typeof sprite!=="undefined"){ sprite.material.opacity=0.14+Math.sin(t*1.2)*0.06; sprite2.material.opacity=0.08+Math.sin(t*0.8+1)*0.04; }
     orb.rotation.y += 0.004; wire.rotation.y -= 0.003; wire.rotation.x += 0.002;
 
     // Rings
