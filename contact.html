@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — IADOPT.AI</title>
+<meta name="description" content="Get in touch with the IADOPT.AI team. We're here to help you deploy enterprise-grade AI across your business.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2302020F'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%2322D3EE' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%236366F1'/%3E%3Cline x1='16' y1='2' x2='16' y2='9' stroke='%2322D3EE' stroke-width='1.5'/%3E%3Cline x1='16' y1='23' x2='16' y2='30' stroke='%2322D3EE' stroke-width='1.5'/%3E%3Cline x1='2' y1='16' x2='9' y2='16' stroke='%2322D3EE' stroke-width='1.5'/%3E%3Cline x1='23' y1='16' x2='30' y2='16' stroke='%2322D3EE' stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://jarvis240615-cmyk.github.io/iapodt-website/contact.html">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #02020F;
+  --indigo: #6366F1;
+  --cyan: #22D3EE;
+  --gold: #F59E0B;
+  --red: #EF4444;
+  --text: #E2E8F0;
+  --muted: #64748B;
+  --glass: rgba(34,211,238,0.04);
+  --glass-border: rgba(34,211,238,0.15);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, .font-display { font-family: 'Orbitron', sans-serif; }
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(2,2,15,0.85);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+}
+
+.nav-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--cyan);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+.nav-back {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--glass-border);
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.nav-back:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* HUD GRID */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* AMBIENT GLOW */
+.glow-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(100px);
+  opacity: 0.12;
+}
+.glow-orb-1 {
+  width: 500px; height: 500px;
+  background: var(--cyan);
+  top: -100px; right: -100px;
+}
+.glow-orb-2 {
+  width: 400px; height: 400px;
+  background: var(--indigo);
+  bottom: 0; left: -100px;
+}
+
+/* PAGE WRAPPER */
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 7rem 2rem 5rem;
+}
+
+/* HEADER */
+.page-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.hud-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #fff 0%, var(--cyan) 60%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.page-header .subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* GRID LAYOUT */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* INFO CARDS */
+.info-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.info-card:hover { border-color: var(--cyan); }
+
+.info-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 30px; height: 30px;
+  border-top: 2px solid var(--cyan);
+  border-left: 2px solid var(--cyan);
+  opacity: 0.5;
+  border-radius: 4px 0 0 0;
+}
+
+.info-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.info-card-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.4rem;
+  opacity: 0.8;
+}
+
+.info-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.info-card p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.info-card a {
+  color: var(--cyan);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.info-card a:hover { text-decoration: underline; }
+
+/* FORM CARD */
+.form-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--gold), transparent);
+  opacity: 0.6;
+}
+
+.form-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 40px; height: 40px;
+  border-top: 2px solid var(--cyan);
+  border-left: 2px solid var(--cyan);
+  opacity: 0.5;
+  border-radius: 4px 0 0 0;
+}
+
+.form-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  margin-bottom: 1.75rem;
+  opacity: 0.8;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 500px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--cyan);
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: rgba(34,211,238,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-appearance: none;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--cyan);
+  background: rgba(34,211,238,0.06);
+}
+
+.form-group select option {
+  background: #02020F;
+  color: var(--text);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.9rem 2rem;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.3s, background 0.3s, transform 0.15s;
+  margin-top: 0.5rem;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cyan);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.submit-btn:hover {
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+
+.submit-btn:hover::before { opacity: 1; }
+
+.submit-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.submit-btn:active { transform: translateY(0); }
+
+/* DIVIDER */
+.hud-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+.hud-divider::before, .hud-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0.3;
+}
+.hud-divider span {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  color: var(--cyan);
+  opacity: 0.5;
+  letter-spacing: 0.15em;
+}
+
+/* FOOTER */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2.5rem;
+  border-top: 1px solid var(--glass-border);
+  margin-top: 4rem;
+}
+
+.footer-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  letter-spacing: 0.08em;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.footer-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--cyan); }
+
+.footer-copy {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+
+<div class="glow-orb glow-orb-1"></div>
+<div class="glow-orb glow-orb-2"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">IADOPT.AI</a>
+  <a href="index.html" class="nav-back">← BACK TO HOME</a>
+</nav>
+
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div class="hud-label">// ESTABLISH CONNECTION //</div>
+    <h1>Contact Us</h1>
+    <p class="subtitle">Reach out and we'll get back to you within one business day.</p>
+  </div>
+
+  <div class="contact-grid">
+
+    <!-- LEFT: Info -->
+    <div>
+      <div class="info-card">
+        <div class="info-card-icon">📡</div>
+        <div class="info-card-label">General Inquiries</div>
+        <h3>Say Hello</h3>
+        <p>For general questions, partnerships, and press inquiries.</p>
+        <p style="margin-top:0.5rem"><a href="mailto:hello@iadopt.ai">hello@iadopt.ai</a></p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon">🔐</div>
+        <div class="info-card-label">Privacy &amp; Legal</div>
+        <h3>Privacy Team</h3>
+        <p>Data requests, GDPR, privacy policy questions.</p>
+        <p style="margin-top:0.5rem"><a href="mailto:privacy@iadopt.ai">privacy@iadopt.ai</a></p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon">⚡</div>
+        <div class="info-card-label">Enterprise Sales</div>
+        <h3>Deploy at Scale</h3>
+        <p>Ready to deploy AI across your organization? Let's talk.</p>
+        <p style="margin-top:0.5rem"><a href="mailto:hello@iadopt.ai">hello@iadopt.ai</a></p>
+      </div>
+
+      <div class="hud-divider"><span>RESPONSE TIME</span></div>
+
+      <div class="info-card">
+        <div class="info-card-label">// SLA //</div>
+        <h3 style="font-size:0.85rem; margin-bottom:0.75rem">Response Protocols</h3>
+        <p>General inquiries: <strong style="color:var(--cyan)">24 hours</strong></p>
+        <p>Enterprise sales: <strong style="color:var(--cyan)">4 hours</strong></p>
+        <p>Privacy requests: <strong style="color:var(--cyan)">72 hours</strong></p>
+        <p>Support tickets: <strong style="color:var(--cyan)">2 hours</strong></p>
+      </div>
+    </div>
+
+    <!-- RIGHT: Form -->
+    <div class="form-card">
+      <div class="form-title">// TRANSMIT MESSAGE //</div>
+
+      <form action="mailto:hello@iadopt.ai" method="post" enctype="text/plain">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" name="first_name" placeholder="Tony" required>
+          </div>
+          <div class="form-group">
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" name="last_name" placeholder="Stark" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="you@company.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="company">Company</label>
+          <input type="text" id="company" name="company" placeholder="Stark Industries">
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <select id="subject" name="subject">
+            <option value="">Select inquiry type...</option>
+            <option value="demo">Request a Demo</option>
+            <option value="enterprise">Enterprise Inquiry</option>
+            <option value="partnership">Partnership</option>
+            <option value="press">Press / Media</option>
+            <option value="support">Technical Support</option>
+            <option value="privacy">Privacy / Legal</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Tell us about your mission..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <span>TRANSMIT MESSAGE →</span>
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">IADOPT.AI</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy-policy.html">Privacy Policy</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 IADOPT.AI — All rights reserved.</div>
+</footer>
+
+</body>
+</html>
